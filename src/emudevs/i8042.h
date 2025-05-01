@@ -26,11 +26,11 @@
 
 #pragma once
 
-#include "fabgl.h"
+#include "ufabgl.h"
 
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 // 8042 PS/2 Keyboard Controller. Actually it is emulated how it is seen in the IBM AT

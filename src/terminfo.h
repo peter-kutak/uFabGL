@@ -37,7 +37,7 @@
 #include "devdrivers/keyboard.h"
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 
@@ -108,53 +108,21 @@ struct TermInfo {
  * @brief This enum defines supported terminals
  */
 enum TermType {
-  ANSI_VT,        /**< Native ANSI/VT terminal */
-  ADM3A,          /**< Emulated Lear Siegler ADM-3A terminal */
-  ADM31,          /**< Emulated Lear Siegler ADM-31 terminal */
-  Hazeltine1500,  /**< Emulated Hazeltine 1500 terminal */
-  Osborne,        /**< Emulated Osborne I */
-  Kaypro,         /**< Emulated Kaypro */
-  VT52,           /**< Emulated VT52 terminal */
-  ANSILegacy      /**< Legacy ANSI emulation */
+  ANSI_VT        /**< Native ANSI/VT terminal */
 };
 
 
 struct SupportedTerminals {
-  static int count()            { return (int)ANSILegacy - (int)ANSI_VT + 1; }
+  static int count()            { return (int)ANSI_VT - (int)ANSI_VT + 1; }
   static char const * * names() {
-    static char const * TERMS[] = { "ANSI",  "ADM 3A", "ADM 31", "Hazeltine 1500", "Osborne", "Kaypro", "VT52", "ANSI Legacy" };
+    static char const * TERMS[] = { "ANSI" };
     return TERMS;
   }
   static TermType * types() {
-    static TermType TYPES[]     = { ANSI_VT, ADM3A,    ADM31,    Hazeltine1500,    Osborne,   Kaypro,   VT52,   ANSILegacy };
+    static TermType TYPES[]     = { ANSI_VT };
     return TYPES;
   }
 };
-
-
-
-// Lear Siegler ADM-3A
-extern const TermInfo term_ADM3A;
-
-// Lear Siegler ADM-31
-extern const TermInfo term_ADM31;
-
-// Hazeltine 1500
-extern const TermInfo term_Hazeltine1500;
-
-// Osborne I
-extern const TermInfo term_Osborne;
-
-// Kaypro
-extern const TermInfo term_Kaypro;
-
-// VT52
-extern const TermInfo term_VT52;
-
-// ANSI Legacy
-extern const TermInfo term_ANSILegacy;
-
-
 
 
 }

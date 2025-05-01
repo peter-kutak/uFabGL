@@ -54,7 +54,7 @@
 
 
 
-namespace fabgl {
+namespace ufabgl {
 
 /**
  * @brief Callback used when VGADirectController needs to prepare a new scanline to be sent to the VGA output.

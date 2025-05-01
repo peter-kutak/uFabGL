@@ -3,7 +3,7 @@
 
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 const uint8_t infoBitmap_data[] = {

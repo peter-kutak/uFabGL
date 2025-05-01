@@ -31,175 +31,127 @@
 
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Codepage 437
 
-const VirtualKeyToASCII VK2ASCII437[] = {
-
-  { VK_GRAVE_a,      0x85 },    // à
-  { VK_GRAVE_e,      0x8a },    // è
-  { VK_ACUTE_e,      0x82 },    // é
-  { VK_GRAVE_i,      0x8d },    // ì
-  { VK_GRAVE_o,      0x95 },    // ò
-  { VK_GRAVE_u,      0x97 },    // ù
-  { VK_CEDILLA_c,    0x87 },    // ç
-  { VK_ESZETT,       0xe1 },    // ß
-  { VK_UMLAUT_u,     0x81 },    // ü
-  { VK_UMLAUT_o,     0x94 },    // ö
-  { VK_UMLAUT_a,     0x84 },    // ä
-  { VK_ACUTEACCENT,  0x27 },    // ´ -> '  (not in cp437)
-  { VK_POUND,        0x9c },    // £
-  { VK_EURO,         0xee },    // € -> ε  (not in cp437)
-  { VK_DEGREE,       0xf8 },    // °
-  { VK_NEGATION,     0xaa },    // ¬
-  { VK_SQUARE,       0xfd },    // ²
-  { VK_MU,           0xe6 },    // µ
-  { VK_CEDILLA_C,    0x80 },    // Ç
-  { VK_TILDE_n,      0xa4 },    // ñ
-  { VK_TILDE_N,      0xa5 },    // Ñ
-  { VK_UPPER_a,      0xa6 },    // ª
-  { VK_ACUTE_a,      0xa0 },    // á
-  { VK_ACUTE_o,      0xa2 },    // ó
-  { VK_ACUTE_u,      0xa3 },    // ú
-  { VK_UMLAUT_i,     0x8b },    // ï
-  { VK_EXCLAIM_INV,  0xad },    // ¡
-  { VK_QUESTION_INV, 0xa8 },    // ¿
-  { VK_ACUTE_A,      0x41 },    // Á -> A  (not in cp437)
-  { VK_ACUTE_E,      0x90 },    // É
-  { VK_ACUTE_I,      0x49 },    // Í -> I  (not in cp437)
-  { VK_ACUTE_O,      0xe0 },    // Ó -> O  (not in cp437)
-  { VK_ACUTE_U,      0x55 },    // Ú -> U  (not in cp437)
-  { VK_GRAVE_A,      0x41 },    // À -> A  (not in cp437)
-  { VK_GRAVE_E,      0x45 },    // È -> E  (not in cp437)
-  { VK_GRAVE_I,      0x49 },    // Ì -> I  (not in cp437)
-  { VK_GRAVE_O,      0x4f },    // Ò -> O  (not in cp437)
-  { VK_GRAVE_U,      0x55 },    // Ù -> U  (not in cp437)
-  { VK_INTERPUNCT,   0xfa },    // ·
-  { VK_UMLAUT_e,     0x89 },    // ë
-  { VK_UMLAUT_A,     0x8e },    // Ä
-  { VK_UMLAUT_E,     0x45 },    // Ë -> E  (not in cp437)
-  { VK_UMLAUT_I,     0x49 },    // Ï -> I  (not in cp437)
-  { VK_UMLAUT_O,     0x99 },    // Ö
-  { VK_UMLAUT_U,     0x9a },    // Ü
-  { VK_CARET_a,      0x83 },    // â
-  { VK_CARET_e,      0x88 },    // ê
-  { VK_CARET_i,      0x8c },    // î
-  { VK_CARET_o,      0x93 },    // ô
-  { VK_CARET_u,      0x96 },    // û
-  { VK_CARET_A,      0x41 },    // Â -> A  (not in cp437)
-  { VK_CARET_E,      0x45 },    // Ê -> E  (not in cp437)
-  { VK_CARET_I,      0x49 },    // Î -> I  (not in cp437)
-  { VK_CARET_O,      0x4f },    // Ô -> O  (not in cp437)
-  { VK_CARET_U,      0x55 },    // Û -> U  (not in cp437)
-  { VK_TILDE_a,      0x61 },    // ã -> a  (not in cp437)
-  { VK_TILDE_A,      0x41 },    // Ã -> A  (not in cp437)
-  { VK_TILDE_o,      0x6f },    // õ -> o  (not in cp437)
-  { VK_TILDE_O,      0x4f },    // Õ -> O  (not in cp437)
-  { VK_GRAVE_y,      0x79 },    // ỳ -> y  (not in cp437)
-  { VK_GRAVE_Y,      0x59 },    // Ỳ -> Y  (not in cp437)
-  { VK_ACUTE_y,      0x79 },    // ý -> y  (not in cp437)
-  { VK_ACUTE_Y,      0x59 },    // Ý -> Y  (not in cp437)
-  { VK_CARET_y,      0x79 },    // ŷ -> y  (not in cp437)
-  { VK_CARET_Y,      0x59 },    // Ŷ -> Y  (not in cp437)
-  { VK_UMLAUT_y,     0x98 },    // ÿ
-  { VK_UMLAUT_Y,     0x59 },    // Ÿ -> Y  (not in cp437)
-
-  { VK_NONE,         0x00 },    // end of table
-};
-
-const CodePage CodePage437 = {
-  437,
-  VK2ASCII437,
-};
+const VirtualKeyToUnicode convTable[] = {
 
 
+  { VK_EXCLAIM_INV,  0x00a1 },    // ¡
+  { VK_POUND,        0x00a3 },    // £
+  { VK_SECTION,      0x00a7 },    // §
+  { VK_DIAERESIS,    0x00a8 },    // ¨
+  { VK_NEGATION,     0x00ac },    // ¬
+  { VK_UPPER_a,      0x00aa },    // ª
+  { VK_DEGREE,       0x00b0 },    // °
+  { VK_SQUARE,       0x00b2 },    // ²
+  { VK_ACUTEACCENT,  0x00b4 },    // ´
+  { VK_MU,           0x00b5 },    // µ
+  { VK_INTERPUNCT,   0x00b7 },    // ·
+  { VK_QUESTION_INV, 0x00bf },    // ¿
+  { VK_GRAVE_A,      0x00c0 },    // À
+  { VK_ACUTE_A,      0x00c1 },    // Á
+  { VK_CARET_A,      0x00c2 },    // Â
+  { VK_TILDE_A,      0x00c3 },    // Ã
+  { VK_UMLAUT_A,     0x00c4 },    // Ä
+  { VK_ARING,        0x00c5 },    // 
+  { VK_AELIG,        0x00c6 },    // 
+  { VK_CEDILLA_C,    0x00c7 },    // Ç
+  { VK_GRAVE_E,      0x00c8 },    // È
+  { VK_ACUTE_E,      0x00c9 },    // É
+  { VK_CARET_E,      0x00ca },    // Ê
+  { VK_UMLAUT_E,     0x00cb },    // Ë
+  { VK_GRAVE_I,      0x00cc },    // Ì
+  { VK_ACUTE_I,      0x00cd },    // Í
+  { VK_CARET_I,      0x00ce },    // Î
+  { VK_UMLAUT_I,     0x00cf },    // Ï
+  { VK_ETH,          0x00d0 },    // Đ 
+  { VK_TILDE_N,      0x00d1 },    // Ñ
+  { VK_GRAVE_O,      0x00d2 },    // Ò
+  { VK_ACUTE_O,      0x00d3 },    // Ó
+  { VK_CARET_O,      0x00d4 },    // Ô
+  { VK_TILDE_O,      0x00d5 },    // Õ
+  { VK_UMLAUT_O,     0x00d6 },    // Ö
+  { VK_GRAVE_U,      0x00d9 },    // Ù
+  { VK_ACUTE_U,      0x00da },    // Ú
+  { VK_CARET_U,      0x00db },    // Û
+  { VK_UMLAUT_U,     0x00dc },    // Ü
+  { VK_ACUTE_Y,      0x00dd },    // Ý
+  { VK_ESZETT,       0x00df },    // ß
+  { VK_GRAVE_a,      0x00e0 },    // à
+  { VK_ACUTE_a,      0x00e1 },    // á
+  { VK_CARET_a,      0x00e2 },    // â
+  { VK_TILDE_a,      0x00e3 },    // ã
+  { VK_UMLAUT_a,     0x00e4 },    // ä
+  { VK_CEDILLA_c,    0x00e7 },    // ç
+  { VK_GRAVE_e,      0x00e8 },    // è
+  { VK_ACUTE_e,      0x00e9 },    // é
+  { VK_CARET_e,      0x00ea },    // ê
+  { VK_UMLAUT_e,     0x00eb },    // ë
+  { VK_GRAVE_i,      0x00ec },    // ì
+  { VK_ACUTE_i,      0x00ed },    // í
+  { VK_CARET_i,      0x00ee },    // î
+  { VK_UMLAUT_i,     0x00ef },    // ï
+  { VK_eth,          0x00f0 },    // đ
+  { VK_TILDE_n,      0x00f1 },    // ñ
+  { VK_GRAVE_o,      0x00f2 },    // ò
+  { VK_ACUTE_o,      0x00f3 },    // ó
+  { VK_CARET_o,      0x00f4 },    // ô
+  { VK_TILDE_o,      0x00f5 },    // õ
+  { VK_UMLAUT_o,     0x00f6 },    // ö
+  { VK_DIV,          0x00f7 },    // 
+  { VK_oslash,       0x00f8 },    // 
+  { VK_GRAVE_u,      0x00f9 },    // ù
+  { VK_ACUTE_u,      0x00fa },    // ú
+  { VK_CARET_u,      0x00fb },    // û
+  { VK_UMLAUT_u,     0x00fc },    // ü
+  { VK_ACUTE_y,      0x00fd },    // ý
+  { VK_UMLAUT_y,     0x00ff },    // ÿ
 
-///////////////////////////////////////////////////////////////////////////////////
-// Codepage 1252
+//  { VK_GRAVE_Y,      0x59 },    // Ỳ -> Y  (not in cp437)
+//  { VK_CARET_Y,      0x59 },    // Ŷ -> Y  (not in cp437)
+//  { VK_GRAVE_y,      0x79 },    // ỳ -> y  (not in cp437)
+//  { VK_CARET_y,      0x79 },    // ŷ -> y  (not in cp437)
 
-const VirtualKeyToASCII VK2ASCII1252[] = {
-  { VK_GRAVE_a,      0xe0 },    // à
-  { VK_GRAVE_e,      0xe8 },    // è
-  { VK_ACUTE_e,      0xe9 },    // é
-  { VK_GRAVE_i,      0xec },    // ì
-  { VK_GRAVE_o,      0xf2 },    // ò
-  { VK_GRAVE_u,      0xf9 },    // ù
-  { VK_CEDILLA_c,    0xe7 },    // ç
-  { VK_ESZETT,       0xdf },    // ß
-  { VK_UMLAUT_u,     0xfc },    // ü
-  { VK_UMLAUT_o,     0xf6 },    // ö
-  { VK_UMLAUT_a,     0xe4 },    // ä
-  { VK_ACUTEACCENT,  0xb4 },    // ´
-  { VK_POUND,        0xa3 },    // £
-  { VK_EURO,         0x80 },    // €
-  { VK_DEGREE,       0xb0 },    // °
-  { VK_SECTION,      0xa7 },    // §
-  { VK_NEGATION,     0xac },    // ¬
-  { VK_SQUARE,       0xb2 },    // ²
-  { VK_MU,           0xb5 },    // µ
-  { VK_CEDILLA_C,    0xc7 },    // Ç
-  { VK_TILDE_n,      0xf1 },    // ñ
-  { VK_TILDE_N,      0xd1 },    // Ñ
-  { VK_UPPER_a,      0xaa },    // ª
-  { VK_ACUTE_a,      0xe1 },    // á
-  { VK_ACUTE_o,      0xf3 },    // ó
-  { VK_ACUTE_u,      0xfa },    // ú
-  { VK_UMLAUT_i,     0xef },    // ï
-  { VK_EXCLAIM_INV,  0xa1 },    // ¡
-  { VK_QUESTION_INV, 0xbf },    // ¿
-  { VK_ACUTE_A,      0xc1 },    // Á
-  { VK_ACUTE_E,      0xc9 },    // É
-  { VK_ACUTE_I,      0xcd },    // Í
-  { VK_ACUTE_O,      0xd3 },    // Ó
-  { VK_ACUTE_U,      0xda },    // Ú
-  { VK_GRAVE_A,      0xc0 },    // À
-  { VK_GRAVE_E,      0xc8 },    // È
-  { VK_GRAVE_I,      0xcc },    // Ì
-  { VK_GRAVE_O,      0xd2 },    // Ò
-  { VK_GRAVE_U,      0xd9 },    // Ù
-  { VK_INTERPUNCT,   0xb7 },    // ·
-  { VK_DIAERESIS,    0xa8 },    // ¨
-  { VK_UMLAUT_e,     0xeb },    // ë
-  { VK_UMLAUT_A,     0xc4 },    // Ä
-  { VK_UMLAUT_E,     0xcb },    // Ë
-  { VK_UMLAUT_I,     0xcf },    // Ï
-  { VK_UMLAUT_O,     0xd6 },    // Ö
-  { VK_UMLAUT_U,     0xdc },    // Ü
-  { VK_CARET_a,      0xe2 },    // â
-  { VK_CARET_e,      0xea },    // ê
-  { VK_CARET_i,      0xee },    // î
-  { VK_CARET_o,      0xf4 },    // ô
-  { VK_CARET_u,      0xfb },    // û
-  { VK_CARET_A,      0xc2 },    // Â
-  { VK_CARET_E,      0xca },    // Ê
-  { VK_CARET_I,      0xce },    // Î
-  { VK_CARET_O,      0xd4 },    // Ô
-  { VK_CARET_U,      0xdb },    // Û
-  { VK_TILDE_a,      0xe3 },    // ã
-  { VK_TILDE_A,      0xc3 },    // Ã
-  { VK_TILDE_o,      0xf5 },    // õ
-  { VK_TILDE_O,      0xd5 },    // Õ
-  { VK_GRAVE_y,      0x79 },    // ỳ -> y  (not in cp1252)
-  { VK_GRAVE_Y,      0x59 },    // Ỳ -> Y  (not in cp1252)
-  { VK_ACUTE_y,      0xfd },    // ý
-  { VK_ACUTE_Y,      0xdd },    // Ý
-  { VK_CARET_y,      0x79 },    // ŷ -> y  (not in cp1252)
-  { VK_CARET_Y,      0x59 },    // Ŷ -> Y  (not in cp1252)
-  { VK_UMLAUT_y,     0xff },    // ÿ
-  { VK_UMLAUT_Y,     0x9f },    // Ÿ
+  { VK_CARON_C,      0x010c },    // Č
+  { VK_CARON_c,      0x010d },    // č
+  { VK_CARON_D,      0x010e },    // Ď
+  { VK_CARON_d,      0x010f },    // ď
+  { VK_CARON_E,      0x011a },    // Ě
+  { VK_CARON_e,      0x011b },    // ě
+  { VK_CARON_L,      0x013d },    // Ľ
+  { VK_CARON_l,      0x013e },    // ľ
+  { VK_LSTROK,       0x0141 },    // Ł
+  { VK_lstrok,       0x0142 },    // ł
+  { VK_ACUTE_N,      0x0143 },    // Ń
+  { VK_ACUTE_n,      0x0144 },    // ń
+  { VK_CARON_N,      0x0147 },    // Ň
+  { VK_CARON_n,      0x0148 },    // ň
+  { VK_ACUTE_R,      0x0154 },    // Ŕ
+  { VK_ACUTE_r,      0x0155 },    // ŕ
+  { VK_CARON_R,      0x0158 },    // Ř
+  { VK_CARON_r,      0x0159 },    // ř
+  { VK_ACUTE_S,      0x015a },    // Ś
+  { VK_ACUTE_s,      0x015b },    // ś
+  { VK_CARON_S,      0x0160 },    // Š
+  { VK_CARON_s,      0x0161 },    // š
+  { VK_CARON_T,      0x0164 },    // Ť
+  { VK_CARON_t,      0x0165 },    // ť
+  { VK_UMLAUT_Y,     0x0178 },    // Ÿ
+  { VK_ACUTE_Z,      0x0179 },    // 
+  { VK_ACUTE_z,      0x017a },    // 
+  { VK_CARON_Z,      0x017d },    // 
+  { VK_CARON_z,      0x017e },    // 
+  { VK_BREVEACCENT,  0x02d8 },    // 
+  { VK_EURO,         0x20ac },    // €
+  { VK_TM,           0x2122 },    // 
 
   { VK_NONE,         0x00 },    // end of table
 };
-
-const CodePage CodePage1252 = {
-  1252,
-  VK2ASCII1252,
-};
-
 
 
 
@@ -213,9 +165,10 @@ const CodePage CodePage1252 = {
 //    - .CTRL
 //    - .SHIFT
 //    - .SCROLLLOCK
-int virtualKeyToASCII(VirtualKeyItem const & item, CodePage const * codepage)
+char32_t virtualKeyToUnicode(VirtualKeyItem const & item)
 {
-  int r = -1;
+  //char32_t r = -1; //FIXME chce to nieaky iny priznak lebo nemam rozsah do zapornych
+  char32_t r = 0; //FIXME skusim 0 co som nasiel tak pri -1 nastavim 0
 
   if (item.CTRL) {
 
@@ -471,10 +424,10 @@ int virtualKeyToASCII(VirtualKeyItem const & item, CodePage const * codepage)
 
         default:
           // look into codepage table
-          if (codepage) {
-            for (auto cpitem = codepage->convTable; cpitem->vk != VK_NONE; ++cpitem) {
+          if (convTable) {
+            for (auto cpitem = convTable; cpitem->vk != VK_NONE; ++cpitem) {
               if (item.vk == cpitem->vk) {
-                r = cpitem->ASCII;
+                r = cpitem->unicode;
                 break;
               }
             }

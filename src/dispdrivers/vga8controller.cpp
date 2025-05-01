@@ -51,7 +51,7 @@
 
 
 
-namespace fabgl {
+namespace ufabgl {
 
 /*
 To improve drawing and rendering speed pixels order is a bit oddy because we want to pack pixels (3 bits) into a uint32_t and ESP32 is little-endian.

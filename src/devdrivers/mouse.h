@@ -44,7 +44,7 @@
 #include "fabui.h"
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 

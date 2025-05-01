@@ -54,7 +54,7 @@ extern "C" {
 
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 

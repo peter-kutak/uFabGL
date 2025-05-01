@@ -1,3 +1,10 @@
+Quick and very dirty support for UTF-8
+goal is to support bios vt-utf on primergy server and Debian Linux in default configuration
+
+limitations:
+- utf codepage does not fit in memory => very slow
+- diakritika kodovana za znakom a mnoho dalsieho
+
 # FabGL
 ### **ESP32** Display Controller (VGA, Color NTSC/PAL Composite, I2C and SPI displays), PS/2 Mouse and Keyboard Controller, Graphics Library, Sound Engine, Graphical User Interface (GUI), Game/Emulation Engine and ANSI/VT Terminal
 

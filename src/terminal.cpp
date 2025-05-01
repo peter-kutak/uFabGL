@@ -40,7 +40,7 @@
 #pragma GCC optimize ("O2")
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 // Terminal identification ID
@@ -232,15 +232,15 @@ void Terminal::activate(TerminalTransition transition)
       } else {
         // textual controller, use temporary buffer to perform animation
         auto txtCtrl = static_cast<TextualDisplayController*>(m_displayController);
-        auto map = (uint32_t*) heap_caps_malloc(sizeof(uint32_t) * m_columns * m_rows, MALLOC_CAP_8BIT | MALLOC_CAP_INTERNAL);
-        memcpy(map, s_activeTerminal->m_glyphsBuffer.map, sizeof(uint32_t) * m_columns * m_rows);
+        auto map = (GLYPHMAP_TYPE*) heap_caps_malloc(sizeof(GLYPHMAP_TYPE) * m_columns * m_rows, MALLOC_CAP_8BIT | MALLOC_CAP_INTERNAL);
+        memcpy(map, s_activeTerminal->m_glyphsBuffer.map, sizeof(GLYPHMAP_TYPE) * m_columns * m_rows);
         txtCtrl->enableCursor(false);
         txtCtrl->setTextMap(map, m_rows);
         switch (transition) {
           case TerminalTransition::LeftToRight:
             for (int x = 0; x < m_columns; ++x) {
               for (int y = 0; y < m_rows; ++y) {
-                memmove(map + y * m_columns + 1, map + y * m_columns, sizeof(uint32_t) * (m_columns - 1));
+                memmove(map + y * m_columns + 1, map + y * m_columns, sizeof(GLYPHMAP_TYPE) * (m_columns - 1));
                 map[y * m_columns] = m_glyphsBuffer.map[y * m_columns + m_columns - x - 1];
               }
               vTaskDelay(5);
@@ -249,7 +249,7 @@ void Terminal::activate(TerminalTransition transition)
           case TerminalTransition::RightToLeft:
             for (int x = 0; x < m_columns; ++x) {
               for (int y = 0; y < m_rows; ++y) {
-                memmove(map + y * m_columns, map + y * m_columns + 1, sizeof(uint32_t) * (m_columns - 1));
+                memmove(map + y * m_columns, map + y * m_columns + 1, sizeof(GLYPHMAP_TYPE) * (m_columns - 1));
                 map[y * m_columns + m_columns - 1] = m_glyphsBuffer.map[y * m_columns + x];
               }
               vTaskDelay(5);
@@ -634,8 +634,8 @@ void Terminal::loadFont(FontInfo const * font)
 
   }
 
-  if (m_keyboard)
-    m_keyboard->setCodePage(CodePages::get(codepage));
+//  if (m_keyboard)
+//    m_keyboard->setCodePage(CodePages::get(codepage));
 
   // check maximum columns and rows
   if (m_maxColumns > 0 && m_maxColumns < m_columns)
@@ -649,7 +649,7 @@ void Terminal::loadFont(FontInfo const * font)
 
   freeGlyphsMap();
   while (true) {
-    m_glyphsBuffer.map = (uint32_t*) heap_caps_malloc(sizeof(uint32_t) * m_columns * m_rows, MALLOC_CAP_8BIT | MALLOC_CAP_INTERNAL);
+    m_glyphsBuffer.map = (GLYPHMAP_TYPE*) heap_caps_malloc(sizeof(GLYPHMAP_TYPE) * m_columns * m_rows, MALLOC_CAP_8BIT | MALLOC_CAP_INTERNAL);
     if (m_glyphsBuffer.map)
       break;
     // no enough memory, reduce m_rows
@@ -814,10 +814,10 @@ void Terminal::int_clear()
 }
 
 
-void Terminal::clearMap(uint32_t * map)
+void Terminal::clearMap(GLYPHMAP_TYPE * map)
 {
-  uint32_t itemValue = GLYPHMAP_ITEM_MAKE(ASCII_SPC, m_emuState.backgroundColor, m_emuState.foregroundColor, m_glyphOptions);
-  uint32_t * mapItemPtr = map;
+  GLYPHMAP_TYPE itemValue = GLYPHMAP_ITEM_MAKE(ASCII_SPC, m_emuState.backgroundColor, m_emuState.foregroundColor, m_glyphOptions);
+  GLYPHMAP_TYPE * mapItemPtr = map;
   for (int row = 0; row < m_rows; ++row)
     for (int col = 0; col < m_columns; ++col, ++mapItemPtr)
       *mapItemPtr = itemValue;
@@ -994,7 +994,7 @@ void Terminal::blinkText()
     if (m_bitmappedDisplayController)
       m_canvas->beginUpdate();
     for (int y = 0; y < rows; ++y) {
-      uint32_t * itemPtr = m_glyphsBuffer.map + y * cols;
+      GLYPHMAP_TYPE * itemPtr = m_glyphsBuffer.map + y * cols;
       for (int x = 0; x < cols; ++x, ++itemPtr) {
         // character to blink?
         GlyphOptions glyphOptions = glyphMapItem_getOptions(itemPtr);
@@ -1073,11 +1073,11 @@ void Terminal::scrollDown()
 
   // move down screen buffer
   for (int y = m_emuState.scrollingRegionDown - 1; y > m_emuState.scrollingRegionTop - 1; --y)
-    memcpy(m_glyphsBuffer.map + y * m_columns, m_glyphsBuffer.map + (y - 1) * m_columns, m_columns * sizeof(uint32_t));
+    memcpy(m_glyphsBuffer.map + y * m_columns, m_glyphsBuffer.map + (y - 1) * m_columns, m_columns * sizeof(GLYPHMAP_TYPE));
 
   // insert a blank line in the screen buffer
-  uint32_t itemValue = GLYPHMAP_ITEM_MAKE(ASCII_SPC, m_emuState.backgroundColor, m_emuState.foregroundColor, m_glyphOptions);
-  uint32_t * itemPtr = m_glyphsBuffer.map + (m_emuState.scrollingRegionTop - 1) * m_columns;
+  GLYPHMAP_TYPE itemValue = GLYPHMAP_ITEM_MAKE(ASCII_SPC, m_emuState.backgroundColor, m_emuState.foregroundColor, m_glyphOptions);
+  GLYPHMAP_TYPE * itemPtr = m_glyphsBuffer.map + (m_emuState.scrollingRegionTop - 1) * m_columns;
   for (int x = 0; x < m_columns; ++x, ++itemPtr)
     *itemPtr = itemValue;
 
@@ -1120,11 +1120,11 @@ void Terminal::scrollUp()
 
   // move up screen buffer
   for (int y = m_emuState.scrollingRegionTop - 1; y < m_emuState.scrollingRegionDown - 1; ++y)
-    memcpy(m_glyphsBuffer.map + y * m_columns, m_glyphsBuffer.map + (y + 1) * m_columns, m_columns * sizeof(uint32_t));
+    memcpy(m_glyphsBuffer.map + y * m_columns, m_glyphsBuffer.map + (y + 1) * m_columns, m_columns * sizeof(GLYPHMAP_TYPE));
 
   // insert a blank line in the screen buffer
-  uint32_t itemValue = GLYPHMAP_ITEM_MAKE(ASCII_SPC, m_emuState.backgroundColor, m_emuState.foregroundColor, m_glyphOptions);
-  uint32_t * itemPtr = m_glyphsBuffer.map + (m_emuState.scrollingRegionDown - 1) * m_columns;
+  GLYPHMAP_TYPE itemValue = GLYPHMAP_ITEM_MAKE(ASCII_SPC, m_emuState.backgroundColor, m_emuState.foregroundColor, m_glyphOptions);
+  GLYPHMAP_TYPE * itemPtr = m_glyphsBuffer.map + (m_emuState.scrollingRegionDown - 1) * m_columns;
   for (int x = 0; x < m_columns; ++x, ++itemPtr)
     *itemPtr = itemValue;
 
@@ -1180,10 +1180,10 @@ bool Terminal::multilineInsertChar(int charsToMove)
     ++row;
     col = 1;
   }
-  uint32_t lastColItem = 0;
+  GLYPHMAP_TYPE lastColItem = 0;
   while (charsToMove > 0) {
-    uint32_t * rowPtr = m_glyphsBuffer.map + (row - 1) * m_columns;
-    uint32_t lItem = rowPtr[m_columns - 1];
+    GLYPHMAP_TYPE * rowPtr = m_glyphsBuffer.map + (row - 1) * m_columns;
+    GLYPHMAP_TYPE lItem = rowPtr[m_columns - 1];
     insertAt(col, row, 1);
     if (row > m_emuState.cursorY) {
       rowPtr[0] = lastColItem;
@@ -1224,14 +1224,14 @@ void Terminal::insertAt(int column, int row, int count)
   }
 
   // move characters in the screen buffer
-  uint32_t * rowPtr = m_glyphsBuffer.map + (row - 1) * m_columns;
+  GLYPHMAP_TYPE * rowPtr = m_glyphsBuffer.map + (row - 1) * m_columns;
   for (int i = m_columns - 1; i >= column + count - 1; --i)
     rowPtr[i] = rowPtr[i - count];
 
   // fill blank characters
   GlyphOptions glyphOptions = m_glyphOptions;
   glyphOptions.doubleWidth = glyphMapItem_getOptions(rowPtr).doubleWidth;
-  uint32_t itemValue = GLYPHMAP_ITEM_MAKE(ASCII_SPC, m_emuState.backgroundColor, m_emuState.foregroundColor, glyphOptions);
+  GLYPHMAP_TYPE itemValue = GLYPHMAP_ITEM_MAKE(ASCII_SPC, m_emuState.backgroundColor, m_emuState.foregroundColor, glyphOptions);
   for (int i = 0; i < count; ++i)
     rowPtr[column + i - 1] = itemValue;
 }
@@ -1256,7 +1256,7 @@ void Terminal::multilineDeleteChar(int charsToMove)
     if (charsToMove > 0) {
       if (m_bitmappedDisplayController && isActive())
         m_canvas->waitCompletion(false);
-      uint32_t * lastItem  = m_glyphsBuffer.map + (row - 1) * m_columns + (m_columns - 1);
+      GLYPHMAP_TYPE * lastItem  = m_glyphsBuffer.map + (row - 1) * m_columns + (m_columns - 1);
       lastItem[0] = lastItem[1];
       refresh(m_columns, row);
     }
@@ -1286,7 +1286,7 @@ void Terminal::deleteAt(int column, int row, int count)
   }
 
   // move characters in the screen buffer
-  uint32_t * rowPtr = m_glyphsBuffer.map + (row - 1) * m_columns;
+  GLYPHMAP_TYPE * rowPtr = m_glyphsBuffer.map + (row - 1) * m_columns;
   int itemsToMove = m_columns - column - count + 1;
   for (int i = 0; i < itemsToMove; ++i)
     rowPtr[column - 1 + i] = rowPtr[column - 1 + i + count];
@@ -1294,7 +1294,7 @@ void Terminal::deleteAt(int column, int row, int count)
   // fill blank characters
   GlyphOptions glyphOptions = m_glyphOptions;
   glyphOptions.doubleWidth = glyphMapItem_getOptions(rowPtr).doubleWidth;
-  uint32_t itemValue = GLYPHMAP_ITEM_MAKE(ASCII_SPC, m_emuState.backgroundColor, m_emuState.foregroundColor, glyphOptions);
+  GLYPHMAP_TYPE itemValue = GLYPHMAP_ITEM_MAKE(ASCII_SPC, m_emuState.backgroundColor, m_emuState.foregroundColor, glyphOptions);
   for (int i = m_columns - count + 1 ; i <= m_columns; ++i)
     rowPtr[i - 1] = itemValue;
 }
@@ -1325,7 +1325,7 @@ void Terminal::erase(int X1, int Y1, int X2, int Y2, uint8_t c, bool maintainDou
   glyphOptions.fillBackground = 1;
 
   for (int y = Y1; y <= Y2; ++y) {
-    uint32_t * itemPtr = m_glyphsBuffer.map + X1 + y * m_columns;
+    GLYPHMAP_TYPE * itemPtr = m_glyphsBuffer.map + X1 + y * m_columns;
     for (int x = X1; x <= X2; ++x, ++itemPtr) {
       if (selective && glyphMapItem_getOptions(itemPtr).userOpt2)  // bypass if protected item
         continue;
@@ -1430,7 +1430,7 @@ void Terminal::useAlternateScreenBuffer(bool value)
     m_alternateScreenBuffer = value;
     if (!m_alternateMap) {
       // first usage, need to setup the alternate screen
-      m_alternateMap = (uint32_t*) heap_caps_malloc(sizeof(uint32_t) * m_columns * m_rows, MALLOC_CAP_8BIT | MALLOC_CAP_INTERNAL);
+      m_alternateMap = (GLYPHMAP_TYPE*) heap_caps_malloc(sizeof(GLYPHMAP_TYPE) * m_columns * m_rows, MALLOC_CAP_8BIT | MALLOC_CAP_INTERNAL);
       clearMap(m_alternateMap);
       m_alternateCursorX = 1;
       m_alternateCursorY = 1;
@@ -1540,7 +1540,16 @@ void Terminal::send(uint8_t c)
     
   localWrite(c);  // write to m_outputQueue
 }
-
+void Terminal::sendUnicode(char32_t c)
+{
+  uint8_t buff[4];
+  auto l = unicodeToUtf(c, buff);
+  for(int i=0; i<l; i++) {
+    //FIXME jednotlive znaky by sa uz nemali interpretovat na riadiace znaky
+    //Euro obsahuje posun spat
+    send(buff[i]);
+  }
+}
 
 // send a string to onSend() delegate or m_outputQueue
 void Terminal::send(char const * str)
@@ -1668,27 +1677,6 @@ void Terminal::int_setTerminalType(TermType value)
   switch (value) {
     case TermType::ANSI_VT:
       int_setTerminalType(nullptr);
-      break;
-    case TermType::ADM3A:
-      int_setTerminalType(&term_ADM3A);
-      break;
-    case TermType::ADM31:
-      int_setTerminalType(&term_ADM31);
-      break;
-    case TermType::Hazeltine1500:
-      int_setTerminalType(&term_Hazeltine1500);
-      break;
-    case TermType::Osborne:
-      int_setTerminalType(&term_Osborne);
-      break;
-    case TermType::Kaypro:
-      int_setTerminalType(&term_Kaypro);
-      break;
-    case TermType::VT52:
-      int_setTerminalType(&term_VT52);
-      break;
-    case TermType::ANSILegacy:
-      int_setTerminalType(&term_ANSILegacy);
       break;
   }
 }
@@ -1845,7 +1833,7 @@ void Terminal::convQueue(const char * str, bool fromISR)
 }
 
 
-uint32_t Terminal::makeGlyphItem(uint8_t c, GlyphOptions * glyphOptions, Color * newForegroundColor)
+GLYPHMAP_TYPE Terminal::makeGlyphItem(char32_t c, GlyphOptions * glyphOptions, Color * newForegroundColor)
 {
   *newForegroundColor = m_emuState.foregroundColor;
 
@@ -1878,8 +1866,13 @@ uint32_t Terminal::makeGlyphItem(uint8_t c, GlyphOptions * glyphOptions, Color *
 
 
 // set specified character at current cursor position
+// draw that glyph on canvas
 // return true if vertical scroll happened
 bool Terminal::setChar(uint8_t c)
+{
+  return setCharU(c);
+}
+bool Terminal::setCharU(char32_t c)
 {
   bool vscroll = false;
 
@@ -1899,7 +1892,7 @@ bool Terminal::setChar(uint8_t c)
   GlyphOptions glyphOptions = m_glyphOptions;
 
   // doubleWidth must be maintained
-  uint32_t * mapItemPtr = m_glyphsBuffer.map + (m_emuState.cursorX - 1) + (m_emuState.cursorY - 1) * m_columns;
+  GLYPHMAP_TYPE * mapItemPtr = m_glyphsBuffer.map + (m_emuState.cursorX - 1) + (m_emuState.cursorY - 1) * m_columns;
   glyphOptions.doubleWidth = glyphMapItem_getOptions(mapItemPtr).doubleWidth;
   Color newForegroundColor;
   *mapItemPtr = makeGlyphItem(c, &glyphOptions, &newForegroundColor);
@@ -1984,7 +1977,7 @@ void Terminal::setLineDoubleWidth(int row, int value)
   logFmt("setLineDoubleWidth(%d, %d)\n", row, value);
   #endif
 
-  uint32_t * mapItemPtr = m_glyphsBuffer.map + (row - 1) * m_columns;
+  GLYPHMAP_TYPE * mapItemPtr = m_glyphsBuffer.map + (row - 1) * m_columns;
   for (int i = 0; i < m_columns; ++i, ++mapItemPtr) {
     GlyphOptions glyphOptions = glyphMapItem_getOptions(mapItemPtr);
     glyphOptions.doubleWidth = value;
@@ -2052,6 +2045,16 @@ void Terminal::charsConsumerTask(void * pvParameters)
   taskExit();
 }
 
+//1st
+//(c&10000000)==0
+//(c&11100000)==11000000
+//(c&11110000)==11100000
+//(c&11111000)==11110000
+#define ISUTFBEGIN(c) ( (c&0xe0)==0xc0 || (c&0xf0)==0xe0 || (c&0xf8)==0xf0 )
+
+//next
+//(c&11000000)==10000000
+#define ISUTFNEXT(c) ((c&0xc0)==0x80)
 
 void Terminal::consumeInputQueue()
 {
@@ -2073,7 +2076,37 @@ void Terminal::consumeInputQueue()
   else if (ISCTRLCHAR(c))
     execCtrlCode(c);
 
-  else {
+  else if (ISUTFBEGIN(c)) {
+    auto uc = consumeUtf(c);
+    //combined diacritics
+    if (uc >= 0x0300 && uc < 0x0370) {
+      //nop => translit
+      ////char32_t b = read(); //prev char
+      //auto d = uc - 0x0300;
+      ////auto de[] = {,/,,,,,,,:,,o,,v,,,};
+      //static const 
+      //char32_t de[] = {0x00e8,0x00e9,0x00ea,u'e'  ,0x0113,u'e',0x0115,0x0117,0x00eb,u'e'  ,u'e'  ,u'e'  ,0x011b,u'e',u'e',u'e'};
+      //char32_t da[] = {0x00e0,0x00e1,0x00e2,0x00e3,0x0101,u'a',0x0103,u'a'  ,0x00e4,u'a'  ,u'a'  ,u'a'  ,u'a'  ,u'a',u'a',u'a'};
+      //char32_t di[] = {0x00ec,0x00ed,0x00ee,u'i'  ,0x012b,u'i',0x012d,0x0131,0x00ef,u'i'  ,u'i'  ,u'i'  ,0x01d0,u'i',u'i',u'i'};
+      //char32_t doo[]= {0x00f2,0x00f3,0x00f4,0x00f5,0x014d,u'o',0x014f,0x022f,0x00f6,u'o'  ,u'o'  ,u'o'  ,0x01d2,u'o',u'o',u'o'};
+      //char32_t du[] = {0x00f9,0x00fa,0x00fb,0x0169,0x016b,u'u',0x016d,u'u'  ,0x00fc,u'u'  ,0x016f,u'u'  ,0x01d4,u'u',u'u',u'u'};
+      //char32_t dy[] = {u'y'  ,0x00fd,0x0177,u'y'  ,u'y'  ,u'y',u'y'  ,u'y'  ,0x00ff,u'y'  ,u'y'  ,u'y'  ,u'y'  ,u'y',u'y',u'y'};
+      //char32_t dl[] = {u'l'  ,0x013a,u'l'  ,u'l'  ,u'l'  ,u'l',u'l'  ,u'l'  ,u'l'  ,u'l'  ,u'l'  ,u'l'  ,0x013e,u'l',u'l',u'l'};
+      //char32_t dn[] = {u'n'  ,0x0144,u'n'  ,u'n'  ,u'n'  ,u'n',u'n'  ,u'n'  ,u'n'  ,u'n'  ,u'n'  ,u'n'  ,0x0148,u'n',u'n',u'n'};
+      //char32_t dr[] = {u'r'  ,0x0155,u'r'  ,u'r'  ,u'r'  ,u'r',u'r'  ,u'r'  ,u'r'  ,u'r'  ,u'r'  ,u'r'  ,0x0159,u'r',u'r',u'r'};
+      //char32_t ds[] = {u's'  ,0x015b,u's'  ,u's'  ,u's'  ,u's',u's'  ,u's'  ,u's'  ,u's'  ,u's'  ,u's'  ,0x0161,u's',u's',u's'};
+      //char32_t dt[] = {u't'  ,u't'  ,u't'  ,u't'  ,u't'  ,u't',u't'  ,u't'  ,u't'  ,u't'  ,u't'  ,u't'  ,0x0164,u't',u't',u't'};
+      //char32_t dz[] = {u'z'  ,0x017a,u'z'  ,u'z'  ,u'z'  ,u'z',u'z'  ,u'z'  ,u'z'  ,u'z'  ,u'z'  ,u'z'  ,0x017e,u'z',u'z',u'z'};
+      //backscape
+      //set combined
+      //setCharU(de[d]);
+    } else if ((uc & 0xfffffff0) == 0x0000fe00) {
+      //variation selector
+      //ako kreslit emoji
+    } else {
+      setCharU(uc);
+    }
+  } else {
     if (m_emuState.characterSet[m_emuState.characterSetIndex] == 0 || (!m_emuState.ANSIMode && m_emuState.VT52GraphicsMode))
       c = DECGRAPH_TO_CP437[(uint8_t)c];
     setChar(c);
@@ -2175,6 +2208,70 @@ void Terminal::execCtrlCode(uint8_t c)
   }
 }
 
+//buff char[4]
+size_t Terminal::unicodeToUtf(char32_t c, uint8_t* buff)
+{
+  if (c < 0x80) {
+    buff[0] = c;
+    return 1;
+  }
+  if(c<0x0800) {
+    buff[0] = 0xc0 | ((c>>6)&0x1f);
+    buff[1] = 0x80 | ( c    &0x3f);
+    return 2;
+  }
+  if(c<0x00010000) {
+    buff[0] = 0xe0 | ((c>>12)&0x0f);
+    buff[1] = 0x80 | ((c>> 6)&0x3f);
+    buff[2] = 0x80 | (c      &0x3f);
+    return 3;
+  }
+  if(c<0x00200000) {
+    buff[0] = 0xf0 | ((c>>18)&0x07);
+    buff[1] = 0x80 | ((c>>12)&0x3f);
+    buff[2] = 0x80 | ((c>> 6)&0x3f);
+    buff[3] = 0x80 | ( c     &0x3f);
+    return 4;
+  }
+  return 0;
+//  if(c<0x04000000) {
+//    buff[0] = 0xf8 | ((c>>24)&0x03);
+//    buff[1] = 0x80 | ((c>>16)&0x3f);
+//    buff[2] = 0x80 | ((c>>12)&0x3f);
+//    buff[3] = 0x80 | ((c>> 6)&0x3f);
+//    buff[4] = 0x80 | ( c     &0x3f);
+//    return 5;
+//  }
+//  if(c<0x80000000) {
+//    buff[0] = 0xfc | ((c>>30)&0x01);
+//    buff[1] = 0x80 | ((c>>24)&0x3f);
+//    buff[2] = 0x80 | ((c>>16)&0x3f);
+//    buff[3] = 0x80 | ((c>>12)&0x3f);
+//    buff[4] = 0x80 | ((c>> 6)&0x3f);
+//    buff[5] = 0x80 | ( c     &0x3f);
+//    return 6;
+//  }
+}
+char32_t Terminal::consumeUtf(uint8_t b)
+{
+  char32_t result = 0;
+  int i = 0;
+  uint8_t k = 0x40;
+  while ( b & (k >> i) ) {
+    i++;
+    uint8_t c = getNextCode(true);   // true: process ctrl chars
+    if(!ISUTFNEXT(c)) {
+      //log("invalid UTF-8 sequence");
+      //pushback(c);
+      //break;
+      return b;
+    }
+    result = result << 6;
+    result += (c & 0x3f);
+  }
+  result += ((0x3f >> i) & b) << (i*6);
+  return result;//zatial dam otaznik
+}
 
 // consume non-CSI and CSI (ESC is already consumed)
 void Terminal::consumeESC()
@@ -3683,55 +3780,6 @@ void Terminal::consumeFabGLSeq()
       break;
     }
 
-    // Setup ADC
-    // Seq:
-    //    ESC FABGLEXT_STARTCODE FABGLEXTX_SETUPADC RESOLUTION ';' ATTENUATION ';' GPIONUM FABGLEXT_ENDCODE
-    // params:
-    //    RESOLUTION (text)  : '9', '10', '11', '12'
-    //    ATTENUATION (text) :
-    //                   '0' = 0dB   (reduced to 1/1), full-scale voltage 1.1 V, accurate between 100 and 950 mV
-    //                   '1' = 2.5dB (reduced to 1/1.34), full-scale voltage 1.5 V, accurate between 100 and 1250 mV
-    //                   '2' = 6dB   (reduced to 1/2), full-scale voltage 2.2 V, accurate between 150 to 1750 mV
-    //                   '3' = 11dB  (reduced to 1/3.6), full-scale voltage 3.9 V (maximum volatage is still 3.3V!!), accurate between 150 to 2450 mV
-    //    GPIONUM (text)     : '32'...'39'
-    case FABGLEXTX_SETUPADC:
-    {
-      auto width   = (adc_bits_width_t) (extGetIntParam() - 9);
-      extGetByteParam();  // ';'
-      auto atten   = (adc_atten_t) extGetIntParam();
-      extGetByteParam();  // ';'
-      auto channel = ADC1_GPIO2Channel((gpio_num_t)extGetIntParam());
-      extGetByteParam();  // FABGLEXT_ENDCODE
-      adc1_config_width(width);
-      adc1_config_channel_atten(channel, atten);
-      break;
-    }
-
-    // Read ADC
-    // Seq:
-    //    ESC FABGLEXT_STARTCODE FABGLEXTX_READADC GPIONUM FABGLEXT_ENDCODE
-    // params:
-    //    GPIONUM (text) : '32'...'39'
-    // return:
-    //    byte: FABGLEXT_REPLYCODE   (reply tag)
-    //    char: 1 hex digit of 16 bit value  (most significant nibble)
-    //    char: 2 hex digit of 16 bit value
-    //    char: 3 hex digit of 16 bit value  (least significant nibble)
-    //
-    // Example of return value if read value is 160 (0x0A0):
-    //       '0'
-    //       'A'
-    //       '0'
-    case FABGLEXTX_READADC:
-    {
-      auto val = adc1_get_raw(ADC1_GPIO2Channel((gpio_num_t)extGetIntParam()));
-      extGetByteParam(); // FABGLEXT_ENDCODE
-      send(FABGLEXT_REPLYCODE);
-      send(toupper(digit2hex((val & 0xF00) >> 8)));
-      send(toupper(digit2hex((val & 0x0F0) >> 4)));
-      send(toupper(digit2hex(val & 0x00F)));
-      break;
-    }
 
     // Sound
     // Seq:
@@ -4514,7 +4562,7 @@ void Terminal::ANSIDecodeVirtualKey(VirtualKeyItem const & item)
 
     default:
     {
-      switch (item.ASCII) {
+      switch (item.unicode) {
 
         // RETURN (CR)?
         case ASCII_CR:
@@ -4525,8 +4573,8 @@ void Terminal::ANSIDecodeVirtualKey(VirtualKeyItem const & item)
           break;
 
         default:
-          if (item.ASCII > 0)
-            send(item.ASCII);
+          if (item.unicode > 0)
+            sendUnicode(item.unicode);
           break;
       }
       break;
@@ -4624,8 +4672,8 @@ void Terminal::VT52DecodeVirtualKey(VirtualKeyItem const & item)
 
     default:
     {
-      if (item.ASCII > 0)
-        send(item.ASCII);
+      if (item.unicode > 0)
+        sendUnicode(item.unicode);
       break;
     }
 
@@ -4643,8 +4691,8 @@ void Terminal::TermDecodeVirtualKey(VirtualKeyItem const & item)
   }
 
   // default behavior
-  if (item.ASCII > 0)
-    send(item.ASCII);
+  if (item.unicode > 0)
+    sendUnicode(item.unicode);
 }
 
 

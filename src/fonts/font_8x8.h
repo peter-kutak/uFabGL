@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace fabgl {
+namespace ufabgl {
 
 #ifdef FABGL_FONT_INCLUDE_DEFINITION
 

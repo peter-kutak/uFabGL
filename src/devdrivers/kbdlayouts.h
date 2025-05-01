@@ -43,7 +43,7 @@
 
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 
@@ -117,14 +117,17 @@ extern const KeyboardLayout BelgianLayout;
 /** @brief Norwegian keyboard layout */
 extern const KeyboardLayout NorwegianLayout;
 
-/** @brief Japanese keyboard layout */
+/** @briEf Japanese keyboard layout */
 extern const KeyboardLayout JapaneseLayout;
+
+/** @briEf Slovak keyboard layout */
+extern const KeyboardLayout SlovakLayout;
 
 
 
 struct SupportedLayouts {
 
-  static constexpr int LAYOUTSCOUNT = 9;
+  static constexpr int LAYOUTSCOUNT = 10;
 
   static int count()               { return LAYOUTSCOUNT; }
 
@@ -139,6 +142,7 @@ struct SupportedLayouts {
         BelgianLayout.desc,
         NorwegianLayout.desc,
         JapaneseLayout.desc,
+        SlovakLayout.desc,
     };
     return NAMES;
   }
@@ -154,6 +158,7 @@ struct SupportedLayouts {
         BelgianLayout.name,
         NorwegianLayout.name,
         JapaneseLayout.name,
+        SlovakLayout.name,
     };
     return SNAMES;
   }
@@ -169,6 +174,7 @@ struct SupportedLayouts {
         &BelgianLayout,
         &NorwegianLayout,
         &JapaneseLayout,
+        &SlovakLayout,
     };
     return LAYOUTS;
   }

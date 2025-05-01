@@ -695,7 +695,7 @@
  */
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 
@@ -1216,6 +1216,8 @@ public:
    * @param c Character code to send
    */
   void send(uint8_t c);
+  void sendUnicode(char32_t c);
+//  void send(uint8_t* buf, int len);
 
   /**
    * @brief Like localWrite() but sends also to serial port if connected
@@ -1326,7 +1328,7 @@ public:
    *
    * Parameter contains the character to send
    */
-  Delegate<uint8_t> onSend;
+  Delegate<char32_t> onSend;
   
   
   /**
@@ -1334,7 +1336,7 @@ public:
    *
    * Parameter contains the character received
    */
-  Delegate<uint8_t> onReceive;
+  Delegate<char32_t> onReceive;
   
   /**
    * @brief Delegate called whenever the terminal is ready to send
@@ -1380,7 +1382,7 @@ private:
 
   void reset();
   void int_clear();
-  void clearMap(uint32_t * map);
+  void clearMap(GLYPHMAP_TYPE * map);
 
   void freeFont();
   void freeTabStops();
@@ -1420,6 +1422,8 @@ private:
   void erase(int X1, int Y1, int X2, int Y2, uint8_t c, bool maintainDoubleWidth, bool selective);
 
   void consumeInputQueue();
+  char32_t consumeUtf(uint8_t);
+  size_t unicodeToUtf(char32_t c, uint8_t* buf);
   void consumeESC();
   void consumeCSI();
   void consumeOSC();
@@ -1446,6 +1450,7 @@ private:
 
   uint8_t getNextCode(bool processCtrlCodes);
 
+  bool setCharU(char32_t c);
   bool setChar(uint8_t c);
   GlyphOptions getGlyphOptionsAt(int X, int Y);
 
@@ -1497,7 +1502,7 @@ private:
 
   void freeSprites();
 
-  uint32_t makeGlyphItem(uint8_t c, GlyphOptions * glyphOptions, Color * newForegroundColor);
+  GLYPHMAP_TYPE makeGlyphItem(char32_t c, GlyphOptions * glyphOptions, Color * newForegroundColor);
   
   // indicates which is the active terminal when there are multiple instances of Terminal
   static Terminal *  s_activeTerminal;
@@ -1516,7 +1521,7 @@ private:
   GlyphsBuffer       m_glyphsBuffer;
 
   // used to implement alternate screen buffer
-  uint32_t *         m_alternateMap;
+  GLYPHMAP_TYPE *    m_alternateMap;
 
   // true when m_alternateMap and m_glyphBuffer.map has been swapped
   bool               m_alternateScreenBuffer;

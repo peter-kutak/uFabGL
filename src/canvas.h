@@ -41,7 +41,7 @@
 #include "displaycontroller.h"
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 

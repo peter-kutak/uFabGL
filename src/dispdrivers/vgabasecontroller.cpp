@@ -46,7 +46,7 @@
 #pragma GCC optimize ("O2")
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 #if FABGLIB_VGAXCONTROLLER_PERFORMANCE_CHECK

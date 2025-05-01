@@ -41,7 +41,7 @@
 #include "fabglconf.h"
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 // Note about *frameGroupCount* and PAL:

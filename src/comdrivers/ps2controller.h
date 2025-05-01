@@ -43,7 +43,7 @@
 #include "fabglconf.h"
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 /** \ingroup Enumerations

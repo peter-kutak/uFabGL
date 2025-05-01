@@ -90,7 +90,7 @@
 */
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 
@@ -156,7 +156,8 @@ typedef void * uiTimerHandle;
 /** @brief Contains details about the key event */
 struct uiKeyEventInfo {
   VirtualKey VK;         /**< Virtual key */
-  uint8_t    ASCII;      /**< ASCII value (when applicable) */
+  //uint8_t    ASCII;      /**< ASCII value (when applicable) */
+  char32_t   unicode;    /**< ASCII value (when applicable) */
   uint8_t    LALT  : 1;  /**< Status of left-ALT key */
   uint8_t    RALT  : 1;  /**< Status of right-ALT key */
   uint8_t    CTRL  : 1;  /**< Status of CTRL (left or right) key */
@@ -1508,7 +1509,8 @@ private:
   int getWordPosAtLeft();
   int getWordPosAtRight();
   void selectWordAt(int mouseX);
-  int keyToASCII(uiKeyEventInfo const & key);
+//  int keyToASCII(uiKeyEventInfo const & key);
+  char32_t keyToUnicode(uiKeyEventInfo const & key);
 
 
   uiTextEditStyle m_textEditStyle;
@@ -1529,8 +1531,6 @@ private:
 
   // character index at start of selection (not included if < m_cursorCol, included if > m_cursorCol)
   int              m_selCursorCol;
-
-  CodePage const * m_codepage;
 
 };
 
@@ -3615,50 +3615,50 @@ private:
 
 
 // get out of namespace frequently used names
-using fabgl::uiObject;
-using fabgl::uiButtonKind;
-using fabgl::uiTimerHandle;
-using fabgl::uiTextEdit;
-using fabgl::uiApp;
-using fabgl::uiFrame;
-using fabgl::uiButton;
-using fabgl::uiLabel;
-using fabgl::uiStaticLabel;
-using fabgl::uiImage;
-using fabgl::uiPanel;
-using fabgl::uiMessageBoxIcon;
-using fabgl::uiPaintBox;
-using fabgl::uiOrientation;
-using fabgl::uiListBox;
-using fabgl::uiComboBox;
-using fabgl::uiCheckBox;
-using fabgl::uiCheckBoxKind;
-using fabgl::uiSlider;
-using fabgl::uiStyle;
-using fabgl::uiWindowStyle;
-using fabgl::uiFrameStyle;
-using fabgl::uiScrollableControlStyle;
-using fabgl::uiButtonStyle;
-using fabgl::uiTextEditStyle;
-using fabgl::uiLabelStyle;
-using fabgl::uiHAlign;
-using fabgl::uiImageStyle;
-using fabgl::uiPanelStyle;
-using fabgl::uiPaintBoxStyle;
-using fabgl::uiListBoxStyle;
-using fabgl::uiComboBoxStyle;
-using fabgl::uiCheckBoxStyle;
-using fabgl::uiSliderStyle;
-using fabgl::uiColorListBox;
-using fabgl::uiColorBox;
-using fabgl::uiColorComboBox;
-using fabgl::uiProgressBar;
-using fabgl::uiMessageBoxResult;
-using fabgl::uiKeyEventInfo;
-using fabgl::uiCustomListBox;
-using fabgl::uiFileBrowser;
-using fabgl::uiSplitButton;
-using fabgl::uiSimpleMenu;
+using ufabgl::uiObject;
+using ufabgl::uiButtonKind;
+using ufabgl::uiTimerHandle;
+using ufabgl::uiTextEdit;
+using ufabgl::uiApp;
+using ufabgl::uiFrame;
+using ufabgl::uiButton;
+using ufabgl::uiLabel;
+using ufabgl::uiStaticLabel;
+using ufabgl::uiImage;
+using ufabgl::uiPanel;
+using ufabgl::uiMessageBoxIcon;
+using ufabgl::uiPaintBox;
+using ufabgl::uiOrientation;
+using ufabgl::uiListBox;
+using ufabgl::uiComboBox;
+using ufabgl::uiCheckBox;
+using ufabgl::uiCheckBoxKind;
+using ufabgl::uiSlider;
+using ufabgl::uiStyle;
+using ufabgl::uiWindowStyle;
+using ufabgl::uiFrameStyle;
+using ufabgl::uiScrollableControlStyle;
+using ufabgl::uiButtonStyle;
+using ufabgl::uiTextEditStyle;
+using ufabgl::uiLabelStyle;
+using ufabgl::uiHAlign;
+using ufabgl::uiImageStyle;
+using ufabgl::uiPanelStyle;
+using ufabgl::uiPaintBoxStyle;
+using ufabgl::uiListBoxStyle;
+using ufabgl::uiComboBoxStyle;
+using ufabgl::uiCheckBoxStyle;
+using ufabgl::uiSliderStyle;
+using ufabgl::uiColorListBox;
+using ufabgl::uiColorBox;
+using ufabgl::uiColorComboBox;
+using ufabgl::uiProgressBar;
+using ufabgl::uiMessageBoxResult;
+using ufabgl::uiKeyEventInfo;
+using ufabgl::uiCustomListBox;
+using ufabgl::uiFileBrowser;
+using ufabgl::uiSplitButton;
+using ufabgl::uiSimpleMenu;
 
 
 

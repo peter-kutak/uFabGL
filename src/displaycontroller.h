@@ -49,7 +49,7 @@
 
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 
@@ -385,25 +385,31 @@ union GlyphOptions {
 // 12 .. 15 : FG color (Color)
 // 16 .. 31 : options (GlyphOptions)
 // note: volatile pointer to avoid optimizer to get less than 32 bit from 32 bit access only memory
-#define GLYPHMAP_INDEX_BIT    0
-#define GLYPHMAP_BGCOLOR_BIT  8
-#define GLYPHMAP_FGCOLOR_BIT 12
-#define GLYPHMAP_OPTIONS_BIT 16
-#define GLYPHMAP_ITEM_MAKE(index, bgColor, fgColor, options) (((uint32_t)(index) << GLYPHMAP_INDEX_BIT) | ((uint32_t)(bgColor) << GLYPHMAP_BGCOLOR_BIT) | ((uint32_t)(fgColor) << GLYPHMAP_FGCOLOR_BIT) | ((uint32_t)((options).value) << GLYPHMAP_OPTIONS_BIT))
+#define GLYPHMAP_TYPE          uint64_t
+#define GLYPHMAP_INDEX_TYPE    uint32_t
+#define GLYPHMAP_INDEX_BIT        0
+#define GLYPHMAP_INDEX_MASK    0xFFFFFFFF
+#define GLYPHMAP_BGCOLOR_BIT      32
+#define GLYPHMAP_BGCOLOR_MASK  0x0F
+#define GLYPHMAP_FGCOLOR_BIT     36
+#define GLYPHMAP_FGCOLOR_MASK  0x0F
+#define GLYPHMAP_OPTIONS_BIT     40
+#define GLYPHMAP_OPTIONS_MASK  0xFFFF
+#define GLYPHMAP_ITEM_MAKE(index, bgColor, fgColor, options) (((GLYPHMAP_TYPE)(index) << GLYPHMAP_INDEX_BIT) | ((GLYPHMAP_TYPE)(bgColor) << GLYPHMAP_BGCOLOR_BIT) | ((GLYPHMAP_TYPE)(fgColor) << GLYPHMAP_FGCOLOR_BIT) | ((GLYPHMAP_TYPE)((options).value) << GLYPHMAP_OPTIONS_BIT))
 
-inline uint8_t glyphMapItem_getIndex(uint32_t const volatile * mapItem) { return *mapItem >> GLYPHMAP_INDEX_BIT & 0xFF; }
-inline uint8_t glyphMapItem_getIndex(uint32_t const & mapItem)          { return mapItem >> GLYPHMAP_INDEX_BIT & 0xFF; }
+inline GLYPHMAP_INDEX_TYPE glyphMapItem_getIndex(GLYPHMAP_TYPE const volatile * mapItem) { return *mapItem >> GLYPHMAP_INDEX_BIT & GLYPHMAP_INDEX_MASK; }
+inline GLYPHMAP_INDEX_TYPE glyphMapItem_getIndex(GLYPHMAP_TYPE const & mapItem)          { return mapItem >> GLYPHMAP_INDEX_BIT & GLYPHMAP_INDEX_MASK; }
 
-inline Color glyphMapItem_getBGColor(uint32_t const volatile * mapItem) { return (Color)(*mapItem >> GLYPHMAP_BGCOLOR_BIT & 0x0F); }
-inline Color glyphMapItem_getBGColor(uint32_t const & mapItem)          { return (Color)(mapItem >> GLYPHMAP_BGCOLOR_BIT & 0x0F); }
+inline Color glyphMapItem_getBGColor(GLYPHMAP_TYPE const volatile * mapItem) { return (Color)(*mapItem >> GLYPHMAP_BGCOLOR_BIT & GLYPHMAP_BGCOLOR_MASK); }
+inline Color glyphMapItem_getBGColor(GLYPHMAP_TYPE const & mapItem)          { return (Color)(mapItem >> GLYPHMAP_BGCOLOR_BIT & GLYPHMAP_BGCOLOR_MASK); }
 
-inline Color glyphMapItem_getFGColor(uint32_t const volatile * mapItem) { return (Color)(*mapItem >> GLYPHMAP_FGCOLOR_BIT & 0x0F); }
-inline Color glyphMapItem_getFGColor(uint32_t const & mapItem)          { return (Color)(mapItem >> GLYPHMAP_FGCOLOR_BIT & 0x0F); }
+inline Color glyphMapItem_getFGColor(GLYPHMAP_TYPE const volatile * mapItem) { return (Color)(*mapItem >> GLYPHMAP_FGCOLOR_BIT & GLYPHMAP_FGCOLOR_MASK); }
+inline Color glyphMapItem_getFGColor(GLYPHMAP_TYPE const & mapItem)          { return (Color)(mapItem >> GLYPHMAP_FGCOLOR_BIT & GLYPHMAP_FGCOLOR_MASK); }
 
-inline GlyphOptions glyphMapItem_getOptions(uint32_t const volatile * mapItem) { return (GlyphOptions){.value = (uint16_t)(*mapItem >> GLYPHMAP_OPTIONS_BIT & 0xFFFF)}; }
-inline GlyphOptions glyphMapItem_getOptions(uint32_t const & mapItem)          { return (GlyphOptions){.value = (uint16_t)(mapItem >> GLYPHMAP_OPTIONS_BIT & 0xFFFF)}; }
+inline GlyphOptions glyphMapItem_getOptions(GLYPHMAP_TYPE const volatile * mapItem) { return (GlyphOptions){.value = (uint16_t)(*mapItem >> GLYPHMAP_OPTIONS_BIT & GLYPHMAP_OPTIONS_MASK)}; }
+inline GlyphOptions glyphMapItem_getOptions(GLYPHMAP_TYPE const & mapItem)          { return (GlyphOptions){.value = (uint16_t)(mapItem >> GLYPHMAP_OPTIONS_BIT & GLYPHMAP_OPTIONS_MASK)}; }
 
-inline void glyphMapItem_setOptions(uint32_t volatile * mapItem, GlyphOptions const & options) { *mapItem = (*mapItem & ~((uint32_t)0xFFFF << GLYPHMAP_OPTIONS_BIT)) | ((uint32_t)(options.value) << GLYPHMAP_OPTIONS_BIT); }
+inline void glyphMapItem_setOptions(GLYPHMAP_TYPE volatile * mapItem, GlyphOptions const & options) { *mapItem = (*mapItem & ~((GLYPHMAP_TYPE)GLYPHMAP_OPTIONS_MASK << GLYPHMAP_OPTIONS_BIT)) | ((GLYPHMAP_TYPE)(options.value) << GLYPHMAP_OPTIONS_BIT); }
 
 struct GlyphsBuffer {
   int16_t         glyphsWidth;
@@ -411,7 +417,7 @@ struct GlyphsBuffer {
   uint8_t const * glyphsData;
   int16_t         columns;
   int16_t         rows;
-  uint32_t *      map;  // look at glyphMapItem_... inlined functions
+  GLYPHMAP_TYPE *      map;  // look at glyphMapItem_... inlined functions
 };
 
 
@@ -735,7 +741,7 @@ public:
     virtual int getColumns() = 0;
     virtual int getRows() = 0;
     virtual void adjustMapSize(int * columns, int * rows) = 0;
-    virtual void setTextMap(uint32_t const * map, int rows) = 0;
+    virtual void setTextMap(GLYPHMAP_TYPE const * map, int rows) = 0;
     virtual void enableCursor(bool value) = 0;
     virtual void setCursorPos(int row, int col) = 0;      // row and col starts from 0
     virtual void setCursorForeground(Color value) = 0;

@@ -44,7 +44,7 @@
 #include "terminal.h"
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 

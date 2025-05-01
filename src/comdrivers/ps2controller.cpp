@@ -48,7 +48,7 @@
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 

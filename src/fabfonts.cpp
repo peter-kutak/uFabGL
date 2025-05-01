@@ -31,7 +31,7 @@
 
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 // do not include all fonts in "font" folder to avoid waste of flash
@@ -39,25 +39,14 @@ namespace fabgl {
 // and getPresetFixedFont().
 static const FontInfo * FIXED_WIDTH_EMBEDDED_FONTS[] = {
   // please, bigger fonts first!
-  &FONT_8x19,
   &FONT_8x16,
-  &FONT_8x14,
+//  &FONT_8x14,
   &FONT_8x8,
-  &FONT_8x9,
-  &FONT_6x8,
-  &FONT_5x7,
-  &FONT_4x6,
 };
 
 
 static const FontInfo * VAR_WIDTH_EMBEDDED_FONTS[] = {
   // please, bigger fonts first!
-  &FONT_std_24,
-  &FONT_std_22,
-  &FONT_std_18,
-  &FONT_std_17,
-  &FONT_std_16,
-  &FONT_std_15,
   &FONT_std_14,
   &FONT_std_12,
 };
@@ -137,3 +126,4 @@ FontInfo const * getPresetFixedFont(int width, int height)
 
 
 }
+

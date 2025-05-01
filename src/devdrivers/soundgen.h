@@ -55,7 +55,7 @@
 
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 #define FABGL_SOUNDGEN_DEFAULT_SAMPLE_RATE 16384

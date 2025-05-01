@@ -38,7 +38,7 @@
 #pragma GCC optimize ("O2")
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 
@@ -52,8 +52,7 @@ Keyboard::Keyboard()
     m_SCodeToVKConverterTask(nullptr),
     m_virtualKeyQueue(nullptr),
     m_scancodeSet(2),
-    m_lastDeadKey(VK_NONE),
-    m_codepage(nullptr)
+    m_lastDeadKey(VK_NONE)
 {
 }
 
@@ -254,7 +253,7 @@ char const * Keyboard::virtualKeyToString(VirtualKey virtualKey)
 
 
 // -1 = virtual key cannot be translated to ASCII
-int Keyboard::virtualKeyToASCII(VirtualKey virtualKey)
+char32_t Keyboard::virtualKeyToUnicode(VirtualKey virtualKey)
 {
   VirtualKeyItem item;
   item.vk         = virtualKey;
@@ -267,7 +266,7 @@ int Keyboard::virtualKeyToASCII(VirtualKey virtualKey)
   item.CAPSLOCK   = m_CAPSLOCK;
   item.NUMLOCK    = m_NUMLOCK;
   item.SCROLLLOCK = m_SCROLLLOCK;
-  return fabgl::virtualKeyToASCII(item, m_codepage);
+  return ufabgl::virtualKeyToUnicode(item);
 }
 
 
@@ -517,8 +516,9 @@ bool Keyboard::blockingGetVirtualKey(VirtualKeyItem * item)
     *(++scode) = 0;
 
   // fill ASCII field
-  int ascii = fabgl::virtualKeyToASCII(*item, m_codepage);
-  item->ASCII = ascii > -1 ? ascii : 0;
+  char32_t ascii = ufabgl::virtualKeyToUnicode(*item);
+//FIXME iny priznak ako -1
+  item->unicode = ascii;//ascii > -1 ? ascii : 0;
 
   return item->vk != VK_NONE;
 }
@@ -549,7 +549,7 @@ void Keyboard::injectVirtualKey(VirtualKey virtualKey, bool keyDown, bool insert
   item.vk          = virtualKey;
   item.down        = keyDown;
   item.scancode[0] = 0;  // this is a manual insert, not scancode associated
-  item.ASCII       = virtualKeyToASCII(virtualKey);
+  item.unicode     = virtualKeyToUnicode(virtualKey);
   item.CTRL        = m_CTRL;
   item.LALT        = m_LALT;
   item.RALT        = m_RALT;
@@ -572,7 +572,7 @@ void Keyboard::postVirtualKeyItem(VirtualKeyItem const & item)
   if (m_uiApp) {
     uiEvent evt = uiEvent(nullptr, item.down ? UIEVT_KEYDOWN : UIEVT_KEYUP);
     evt.params.key.VK    = item.vk;
-    evt.params.key.ASCII = item.ASCII;
+    evt.params.key.unicode = item.unicode;
     evt.params.key.LALT  = item.LALT;
     evt.params.key.RALT  = item.RALT;
     evt.params.key.CTRL  = item.CTRL;
@@ -661,7 +661,7 @@ void Keyboard::SCodeToVKConverterTask(void * pvParameters)
           item.vk          = VK_ASCII;
           item.down        = true;
           item.scancode[0] = 0;
-          item.ASCII       = ALTNUMValue;
+          item.unicode     = ALTNUMValue;
           keyboard->postVirtualKeyItem(item); // ascii key down
           item.down        = false;
           keyboard->postVirtualKeyItem(item); // ascii key up

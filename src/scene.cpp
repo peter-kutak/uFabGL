@@ -36,7 +36,7 @@
 #pragma GCC optimize ("O2")
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 Scene::Scene(int maxSpritesCount, int updateTimeMS, int width, int height, int stackSize)

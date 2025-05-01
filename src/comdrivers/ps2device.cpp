@@ -33,7 +33,7 @@
 #pragma GCC optimize ("O2")
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 #define PS2_CMD_SETLEDS                      0xED

@@ -47,7 +47,7 @@
 #define DUMPEVENTS 0
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 
@@ -2700,8 +2700,7 @@ uiTextEdit::uiTextEdit(uiWindow * parent, char const * text, const Point & pos, 
     m_textSpace(0),
     m_viewX(0),
     m_cursorCol(0),
-    m_selCursorCol(0),
-    m_codepage(nullptr)
+    m_selCursorCol(0)
 {
   objectType().uiTextEdit = true;
 
@@ -2827,17 +2826,13 @@ void uiTextEdit::processEvent(uiEvent * event)
 }
 
 
-int uiTextEdit::keyToASCII(uiKeyEventInfo const & key)
+char32_t uiTextEdit::keyToUnicode(uiKeyEventInfo const & key)
 {
-  // check codepage consistency
-  if (m_codepage == nullptr || m_codepage->codepage != m_textEditStyle.textFont->codepage)
-    m_codepage = CodePages::get(m_textEditStyle.textFont->codepage);
-
   VirtualKeyItem item = { };
   item.vk    = key.VK;
   item.CTRL  = key.CTRL;
   item.SHIFT = key.SHIFT;
-  return virtualKeyToASCII(item, m_codepage);
+  return virtualKeyToUnicode(item);
 }
 
 
@@ -2867,12 +2862,13 @@ void uiTextEdit::handleKeyDown(uiKeyEventInfo const & key)
 
         // we don't use key.ASCII because it uses codepage stored in Keyboard object but
         // each textedit may have a different font and codepage
-        auto ASCII = keyToASCII(key);
+        auto unicode = keyToUnicode(key);
 
-        if (ASCII >= 0x20 && ASCII != 0x7F) {
+	//7f je delete aj v unicode
+        if (unicode >= 0x20 && unicode != 0x7F) {
           if (m_cursorCol != m_selCursorCol)
             removeSel();  // there is a selection, same behavior of VK_DELETE
-          insert(ASCII);
+          insert(unicode);
         }
         break;
       }

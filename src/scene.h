@@ -45,7 +45,7 @@
 #define FABGL_DEFAULT_SCENETASK_STACKSIZE 2048
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 

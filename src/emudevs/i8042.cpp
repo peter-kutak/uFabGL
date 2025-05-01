@@ -28,7 +28,7 @@
 
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 // Controller status bits

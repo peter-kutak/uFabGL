@@ -44,7 +44,7 @@
 #include "codepages.h"
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 
@@ -271,7 +271,7 @@ public:
    *
    * @return The ASCII code of virtual key or -1 if virtual key cannot be translated to ASCII.
    */
-  int virtualKeyToASCII(VirtualKey virtualKey);
+  char32_t virtualKeyToUnicode(VirtualKey virtualKey);
 
   /**
    * @brief Sets font codepage for virtual key to ASCII conversion
@@ -285,7 +285,7 @@ public:
    *     // Set codepage 437
    *     Keyboard.setCodePage(CodePages::get(437));
    */
-  void setCodePage(CodePage const * codepage)                      { m_codepage = codepage; }
+//  void setCodePage(CodePage const * codepage)                      { m_codepage = codepage; }
 
   /**
    * @brief Gets the number of scancodes available in the queue.
@@ -446,7 +446,7 @@ private:
   bool                      m_capsLockLED;
   bool                      m_scrollLockLED;
 
-  CodePage const *          m_codepage;
+//  CodePage const *          m_codepage;
 
 };
 

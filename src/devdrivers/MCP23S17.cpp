@@ -32,7 +32,7 @@
 #include "MCP23S17.h"
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 
@@ -149,7 +149,7 @@ void MCP23S17::SPIEnd()
     m_SPIDevHandle = nullptr;
     if (FileBrowser::mountedSDCard()) {
       if (getChipPackage() == ChipPackage::ESP32D0WDQ5) {
-        fabgl::configureGPIO(m_CS, GPIO_MODE_OUTPUT);
+        ufabgl::configureGPIO(m_CS, GPIO_MODE_OUTPUT);
         gpio_set_level(m_CS, 1);
       }
     } else {

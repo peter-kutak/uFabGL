@@ -33,7 +33,7 @@
 #pragma GCC optimize ("O2")
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 #define INVALIDRECT Rect(-32768, -32768, -32768, -32768)

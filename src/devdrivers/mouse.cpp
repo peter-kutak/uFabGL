@@ -35,7 +35,7 @@
 
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 bool Mouse::s_quickCheckHardware = false;

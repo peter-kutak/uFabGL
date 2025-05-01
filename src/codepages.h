@@ -39,37 +39,18 @@
 #include "fabutils.h"
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 
 // associates virtual key to ASCII code
-struct VirtualKeyToASCII {
+struct VirtualKeyToUnicode {
   VirtualKey vk;
-  uint8_t    ASCII;
+  char32_t   unicode;
 };
 
 
-struct CodePage {
-  uint16_t                  codepage;
-  const VirtualKeyToASCII * convTable;  // last item has vk = VK_NONE (ending marker)
-};
-
-
-extern const CodePage CodePage437;
-extern const CodePage CodePage1252;
-
-
-struct CodePages {
-  static int count() { return 2; }
-  static CodePage const * get(uint16_t codepage, CodePage const * defaultValue = &CodePage437) {
-    static const CodePage * codepages[] = { &CodePage437, &CodePage1252 };
-    for (int i = 0; i < sizeof(CodePage) / sizeof(CodePage*); ++i)
-      if (codepages[i]->codepage == codepage)
-        return codepages[i];
-    return defaultValue;
-  }
-};
+extern const VirtualKeyToUnicode convTable[];  // last item has vk = VK_NONE (ending marker)
 
 
 
@@ -87,7 +68,8 @@ struct CodePages {
  *
  * @return The ASCII code of virtual key or -1 if virtual key cannot be translated to ASCII.
  */
-int virtualKeyToASCII(VirtualKeyItem const & item, CodePage const * codepage);
+char32_t virtualKeyToUnicode(VirtualKeyItem const & item);
+//char32_t virtualKeyToUnicode(VirtualKeyItem const & item, VirtualKeyToUnicode * convTable);
 
 
 

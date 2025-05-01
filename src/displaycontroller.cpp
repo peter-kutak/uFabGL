@@ -40,7 +40,7 @@
 #pragma GCC optimize ("O2")
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 
@@ -993,7 +993,7 @@ void IRAM_ATTR BitmappedDisplayController::renderGlyphsBuffer(GlyphsBufferRender
   int glyphsWidth  = glyphsBufferRenderInfo.glyphsBuffer->glyphsWidth;
   int glyphsHeight = glyphsBufferRenderInfo.glyphsBuffer->glyphsHeight;
 
-  uint32_t const * mapItem = glyphsBufferRenderInfo.glyphsBuffer->map + itemX + itemY * glyphsBufferRenderInfo.glyphsBuffer->columns;
+  GLYPHMAP_TYPE const * mapItem = glyphsBufferRenderInfo.glyphsBuffer->map + itemX + itemY * glyphsBufferRenderInfo.glyphsBuffer->columns;
 
   GlyphOptions glyphOptions = glyphMapItem_getOptions(mapItem);
   auto fgColor = glyphMapItem_getFGColor(mapItem);

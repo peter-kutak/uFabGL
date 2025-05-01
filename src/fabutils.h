@@ -36,8 +36,6 @@
  */
 
 
-#include <cstring>
-
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 
@@ -52,7 +50,7 @@
 #endif
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 // manage IDF versioning
@@ -1073,7 +1071,7 @@ inline __attribute__((always_inline)) uint32_t getCycleCount() {
 void replacePathSep(char * path, char newSep);
 
 
-adc1_channel_t ADC1_GPIO2Channel(gpio_num_t gpio);
+//adc1_channel_t ADC1_GPIO2Channel(gpio_num_t gpio);
 
 
 void esp_intr_alloc_pinnedToCore(int source, int flags, intr_handler_t handler, void * arg, intr_handle_t * ret_handle, int core);
@@ -1297,6 +1295,10 @@ enum VirtualKey {
 
   VK_GRAVEACCENT,     /**< Grave accent: ` */
   VK_ACUTEACCENT,     /**< Acute accent: ´ */
+  VK_CARONACCENT,
+  VK_BREVEACCENT,
+  VK_CARETACCENT,
+  VK_RINGACCENT,
   VK_QUOTE,           /**< Quote: ' */
   VK_QUOTEDBL,        /**< Double quote: " */
   VK_EQUALS,          /**< Equals: = */
@@ -1408,9 +1410,14 @@ enum VirtualKey {
   VK_ACUTE_a,         /**< Acute a: á */
   VK_ACUTE_e,         /**< Acute e: é */
   VK_ACUTE_i,         /**< Acute i: í */
+  VK_ACUTE_l,
+  VK_ACUTE_n,
   VK_ACUTE_o,         /**< Acute o: ó */
+  VK_ACUTE_r,
+  VK_ACUTE_s,
   VK_ACUTE_u,         /**< Acute u: ú */
   VK_ACUTE_y,         /**< Acute y: ý */
+  VK_ACUTE_z,         
 
   VK_GRAVE_A,		      /**< Grave A: À */
   VK_GRAVE_E,		      /**< Grave E: È */
@@ -1422,9 +1429,14 @@ enum VirtualKey {
   VK_ACUTE_A,		      /**< Acute A: Á */
   VK_ACUTE_E,		      /**< Acute E: É */
   VK_ACUTE_I,		      /**< Acute I: Í */
+  VK_ACUTE_L,
+  VK_ACUTE_N,
   VK_ACUTE_O,		      /**< Acute O: Ó */
+  VK_ACUTE_R,
+  VK_ACUTE_S,
   VK_ACUTE_U,		      /**< Acute U: Ú */
   VK_ACUTE_Y,         /**< Acute Y: Ý */
+  VK_ACUTE_Z,
 
   VK_UMLAUT_a,        /**< Diaeresis a: ä */
   VK_UMLAUT_e,        /**< Diaeresis e: ë */
@@ -1454,6 +1466,38 @@ enum VirtualKey {
   VK_CARET_U,		      /**< Caret U: Û */
   VK_CARET_Y,         /**< Caret Y: Ŷ */
 
+  VK_CARON_a,
+  VK_CARON_c,
+  VK_CARON_d,
+  VK_CARON_e,
+  VK_CARON_i,
+  VK_CARON_l,
+  VK_CARON_n,
+  VK_CARON_o,
+  VK_CARON_r,
+  VK_CARON_s,
+  VK_CARON_t,
+  VK_CARON_u,
+  VK_CARON_z,
+  VK_CARON_y,
+  VK_CARON_A,
+  VK_CARON_C,
+  VK_CARON_D,
+  VK_CARON_E,
+  VK_CARON_I,
+  VK_CARON_L,
+  VK_CARON_N,
+  VK_CARON_O,
+  VK_CARON_R,
+  VK_CARON_S,
+  VK_CARON_T,
+  VK_CARON_U,
+  VK_CARON_Z,
+  VK_CARON_Y,
+  
+  VK_RING_u,
+  VK_RING_U,
+
   VK_CEDILLA_c,       /**< Cedilla c: ç */
   VK_CEDILLA_C,       /**< Cedilla C: Ç */
   
@@ -1474,15 +1518,21 @@ enum VirtualKey {
   VK_SQUARE,          /**< Square     : ² */
   VK_CURRENCY,        /**< Currency   : ¤ */
   VK_MU,              /**< Mu         : µ */
-  
+  VK_TM,              /** Trademark */ 
   VK_aelig,           /** Lower case aelig  : æ */
   VK_oslash,          /** Lower case oslash : ø */
   VK_aring,           /** Lower case aring  : å */
+  VK_eth,             //đ
+  VK_lstrok,          //ł
 
   VK_AELIG,           /** Upper case aelig  : Æ */
   VK_OSLASH,          /** Upper case oslash : Ø */
   VK_ARING,           /** Upper case aring  : Å */
+  VK_ETH,             //Đ
+  VK_LSTROK,          //Ł
   
+  VK_DIV,             //math division
+
   // Japanese layout support
   VK_YEN,
   VK_MUHENKAN,
@@ -1504,7 +1554,8 @@ struct VirtualKeyItem {
   VirtualKey vk;              /**< Virtual key */
   uint8_t    down;            /**< 0 = up, 1 = down */
   uint8_t    scancode[8];     /**< Keyboard scancode. Ends with zero if length is <8, otherwise gets the entire length (like PAUSE, which is 8 bytes) */
-  uint8_t    ASCII;           /**< ASCII value (0 = if it isn't possible to translate from virtual key) */
+  //uint8_t    ASCII;           /**< ASCII value (0 = if it isn't possible to translate from virtual key) */
+  char32_t   unicode;           /**< ASCII value (0 = if it isn't possible to translate from virtual key) */
   uint8_t    CTRL       : 1;  /**< CTRL key state at the time of this virtual key event */
   uint8_t    LALT       : 1;  /**< LEFT ALT key state at the time of this virtual key event */
   uint8_t    RALT       : 1;  /**< RIGHT ALT key state at the time of this virtual key event */
@@ -1617,7 +1668,7 @@ inline bool isGUI(VirtualKey value)
 
 
 #ifndef ARDUINO
-using fabgl::Stream;
+using ufabgl::Stream;
 #endif
 
 

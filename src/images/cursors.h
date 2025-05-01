@@ -3,7 +3,7 @@
 
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 static const uint8_t pointer_amigalike_11x11[] = {

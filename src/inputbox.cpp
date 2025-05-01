@@ -43,7 +43,7 @@
 using std::unique_ptr;
 
 
-namespace fabgl {
+namespace ufabgl {
 
 
 // well known InputForm::buttonText[] indexes
@@ -769,7 +769,7 @@ void FileBrowserForm::addControls()
   renameButton->anchors().right = true;
   renameButton->onClick = [&]() {
     if (strcmp(fileBrowser->filename(), "..") != 0) {
-      int maxlen = fabgl::imax((int)MAXNAME, (int) strlen(fileBrowser->filename()));
+      int maxlen = ufabgl::imax((int)MAXNAME, (int) strlen(fileBrowser->filename()));
       unique_ptr<char[]> filename(new char[MAXNAME + 1] { 0 } );
       strcpy(filename.get(), fileBrowser->filename());
       if (app->inputBox("Rename File", "New name", filename.get(), maxlen, "Rename", "Cancel") == uiMessageBoxResult::Button1) {
@@ -853,7 +853,7 @@ void FileBrowserForm::doPaste()
   auto bytesToCopy = fileSize;
 
   InputBox ib(app);
-  ib.progressBox("Copying", "Abort", true, app->canvas()->getWidth() * 2 / 3, [&](fabgl::ProgressForm * form) {
+  ib.progressBox("Copying", "Abort", true, app->canvas()->getWidth() * 2 / 3, [&](ufabgl::ProgressForm * form) {
     constexpr int BUFLEN = 4096;
     unique_ptr<uint8_t[]> buf(new uint8_t[BUFLEN]);
     while (bytesToCopy > 0) {

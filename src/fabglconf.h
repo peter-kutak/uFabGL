@@ -64,6 +64,7 @@
 
 /** Number of characters the terminal can "write" without pause (increase if you have loss of characters in serial port). */
 #define FABGLIB_DEFAULT_TERMINAL_INPUT_QUEUE_SIZE 1024
+//#define FABGLIB_DEFAULT_TERMINAL_INPUT_QUEUE_SIZE 2048
 
 
 /** Number of characters the terminal can store from keyboard. */
@@ -104,6 +105,7 @@
 
 /** Optional feature. If enabled terminal fonts are cached in RAM for better performance. */
 #define FABGLIB_CACHE_FONT_IN_RAM 0
+//#define FABGLIB_CACHE_FONT_IN_RAM 1
 
 
 /** Optional feature. Enables Keyboard.virtualKeyToString() method */
