@@ -102,6 +102,7 @@ static const char * RESOLUTIONS_STR[]      = { "1280x768, B&W",           // 0
                                                "720x520, 16 Colors",      // 3
                                                "640x480 73Hz, 16 C.",     // 4
                                                "640x480 60Hz, 16 C.",     // 5
+                                               "640x384 60Hz, 16 C.",     // 5a
                                                "640x350, 16 Colors",      // 6
                                                "512x384, 64 Colors",      // 7
                                                "400x300, 64 Colors",      // 8
@@ -112,6 +113,7 @@ static const char * RESOLUTIONS_CMDSTR[]   = { "1280x768x2",              // 0
                                                "720x520x16",              // 3
                                                "640x480@73x16",           // 4
                                                "640x480@60x16",           // 5
+                                               "640x384@60x16",           // 5a
                                                "640x350x16",              // 6
                                                "512x384x64",              // 7
                                                "400x300x64",              // 8
@@ -123,6 +125,7 @@ static const ResolutionController RESOLUTIONS_CONTROLLER[] = { ResolutionControl
                                                                ResolutionController::VGA16Controller,    // 3
                                                                ResolutionController::VGA16Controller,    // 4
                                                                ResolutionController::VGA16Controller,    // 5
+                                                               ResolutionController::VGA16Controller,    // 5a
                                                                ResolutionController::VGA16Controller,    // 6
                                                                ResolutionController::VGAController,      // 7
                                                                ResolutionController::VGAController,      // 8
@@ -133,6 +136,7 @@ static const char * RESOLUTIONS_MODELINE[] = { SVGA_1280x768_50Hz,        // 0
                                                PAL_720x576_50Hz,          // 3
                                                VGA_640x480_73Hz,          // 4
                                                VGA_640x480_60Hz,          // 5
+                                               VGA_640x384_60Hz,          // 5a
                                                VGA_640x350_70HzAlt1,      // 6
                                                VGA_512x384_60Hz,          // 7
                                                VGA_400x300_60Hz,          // 8
@@ -143,6 +147,7 @@ static const int16_t RESOLUTIONS_HEIGHT[] = {   -1,        // 0
                                                520,        // 3
                                                 -1,        // 4
                                                 -1,        // 5
+                                                -1,        // 5a
                                                 -1,        // 6
                                                 -1,        // 7
                                                 -1,        // 8

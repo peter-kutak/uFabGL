@@ -236,7 +236,9 @@
 #define VGA_640x382_60Hz "\"640x382@60Hz\" 40 640 672 740 840 382 385 387 397 -HSync +VSync DoubleScan"
 
 /** Modeline for 640x384@60Hz resolution */
-#define VGA_640x384_60Hz "\"640x384@60Hz\" 40 640 672 740 840 384 384 386 397 -HSync +VSync DoubleScan"
+//#define VGA_640x384_60Hz "\"640x384@60Hz\" 40 640 672 740 840 384 384 386 397 -HSync +VSync DoubleScan"
+//toto funguje ako DoubleScan https://arachnoid.com/modelines/ 
+#define VGA_640x384_60Hz "\"640x384@60Hz\" 36.68 640 640 704 768 384 385 388 398 -HSync +Vsync DoubleScan"
 
 /** Modeline for 640x400@70Hz resolution */
 #define VGA_640x400_70Hz "\"640x400@70Hz\" 25.175 640 656 752 800 400 412 414 449 -HSync -VSync"
