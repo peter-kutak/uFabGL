@@ -113,7 +113,39 @@
 #include"font_VGA_8x16_unk.h"
 
 //21a0
-#include"font_VGA_8x16_unk0010.h"
+#include"font_VGA_8x16_unk.h"
+#include"font_VGA_8x16_unk.h"
+#include"font_VGA_8x16_unk.h"
+#include"font_VGA_8x16_unk.h"
+#include"font_VGA_8x16_unk.h"
+#include"font_VGA_8x16_unk.h"
+#include"font_VGA_8x16_unk.h"
+#include"font_VGA_8x16_unk.h"
+
+  0b00000000, 
+  0b00000000, 
+  0b00011000, 
+  0b00111100, 
+  0b01111110, 
+  0b00011000, 
+  0b00011000, 
+  0b00011000, 
+  0b01111110, 
+  0b00111100, 
+  0b00011000, 
+  0b01111110, 
+  0b00000000, 
+  0b00000000, 
+  0b00000000, 
+  0b00000000, 
+
+#include"font_VGA_8x16_unk.h"
+#include"font_VGA_8x16_unk.h"
+#include"font_VGA_8x16_unk.h"
+#include"font_VGA_8x16_unk.h"
+#include"font_VGA_8x16_unk.h"
+#include"font_VGA_8x16_unk.h"
+#include"font_VGA_8x16_unk.h"
 //21b0
 #include"font_VGA_8x16_unk0010.h"
 //21c0

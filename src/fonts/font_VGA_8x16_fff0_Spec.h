@@ -1,0 +1,17 @@
+
+UNK_UTF(0xfff0),
+UNK_UTF(0xfff1),
+UNK_UTF(0xfff2),
+UNK_UTF(0xfff3),
+UNK_UTF(0xfff4),
+UNK_UTF(0xfff5),
+UNK_UTF(0xfff6),
+UNK_UTF(0xfff7),
+UNK_UTF(0xfff8),
+UNK_UTF(0xfff9),
+UNK_UTF(0xfffa),
+UNK_UTF(0xfffb),
+UNK_UTF(0xfffc),
+#include"font_VGA_8x16_unk.h"
+UNK_UTF(0xfffe),
+UNK_UTF(0xffff),

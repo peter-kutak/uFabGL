@@ -1,0 +1,56 @@
+
+UNK_UTF(0xfb00),
+
+  0b00000000, 
+  0b00000000, 
+  0b00111110, 
+  0b01100110, 
+  0b01100000, 
+  0b01100000, 
+  0b11111110, 
+  0b01100110, 
+  0b01100110, 
+  0b01100110, 
+  0b01100110, 
+  0b11110111, 
+  0b00000000, 
+  0b00000000, 
+  0b00000000, 
+  0b00000000, 
+
+  0b00000000, 
+  0b00000000, 
+  0b00111110, 
+  0b01100110, 
+  0b01100110, 
+  0b01100110, 
+  0b11110110, 
+  0b01100110, 
+  0b01100110, 
+  0b01100110, 
+  0b01100110, 
+  0b11110111, 
+  0b00000000, 
+  0b00000000, 
+  0b00000000, 
+  0b00000000, 
+
+
+UNK_UTF(0xfb03),
+UNK_UTF(0xfb04),
+UNK_UTF(0xfb05),
+UNK_UTF(0xfb06),
+UNK_UTF(0xfb07),
+UNK_UTF(0xfb08),
+UNK_UTF(0xfb09),
+UNK_UTF(0xfb0a),
+UNK_UTF(0xfb0b),
+UNK_UTF(0xfb0c),
+UNK_UTF(0xfb0d),
+UNK_UTF(0xfb0e),
+UNK_UTF(0xfb0f),
+
+#include"font_VGA_8x16_unk0010.h"
+#include"font_VGA_8x16_unk0010.h"
+#include"font_VGA_8x16_unk0010.h"
+#include"font_VGA_8x16_unk0010.h"
