@@ -348,7 +348,7 @@ static const uint8_t FONT_8x16_DATA[] = {
 //2580-259f
 #include "font_VGA_8x16_Block.h"
 //25a0-25ff
-#include "font_VGA_8x16_Geom.h"
+#include "font_VGA_8x16_25a0_Geom.h"
 //2600-26ff
 #include "font_VGA_8x16_Symb.h"
 //2700
