@@ -1328,7 +1328,7 @@ public:
    *
    * Parameter contains the character to send
    */
-  Delegate<char32_t> onSend;
+  Delegate<uint8_t> onSend;
   
   
   /**
@@ -1336,7 +1336,7 @@ public:
    *
    * Parameter contains the character received
    */
-  Delegate<char32_t> onReceive;
+  Delegate<uint8_t> onReceive;
   
   /**
    * @brief Delegate called whenever the terminal is ready to send
@@ -1612,6 +1612,13 @@ private:
   
   // true if inside ::end()
   volatile bool             m_endingState;
+
+  #define SIXEL_PALETTE_SIZE 256
+  RGB888 sixel_palette[SIXEL_PALETTE_SIZE];
+  void consumeDCSComment();
+  void consumeDCSRQSS();
+  void consumeDCSSixels();
+  void consumeDCSUnknown();
 
 };
 

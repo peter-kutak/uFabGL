@@ -46,9 +46,10 @@ namespace ufabgl {
 // Terminal identification ID
 // 64 = VT420
 // 1 = support for 132 columns
+// 4 = sixel
 // 6 = selective erase
 // 22 = color
-const char TERMID[] = "?64;1;6;22c";
+const char TERMID[] = "?64;1;4;6;22c";
 
 // to send 8 bit (S8C1T) or 7 bit control characters
 const char CSI_7BIT[] = "\e[";
@@ -1546,8 +1547,11 @@ void Terminal::sendUnicode(char32_t c)
   auto l = unicodeToUtf(c, buff);
   for(int i=0; i<l; i++) {
     //FIXME jednotlive znaky by sa uz nemali interpretovat na riadiace znaky
-    //Euro obsahuje posun spat
+    //Euro obsahuje posun spat blbne to len v bash, vim alebo prenos na cutecom funguje dobre
+    //deb12 funguje tiez dobre
     send(buff[i]);
+    //onSend(buff[i]); //toto realne zapise byte do fifo bufru uart zariadenia
+    //localWrite(buff[i]); //nieco so vstupom virtualnych klaves
   }
 }
 
@@ -2081,6 +2085,7 @@ void Terminal::consumeInputQueue()
     //combined diacritics
     if (uc >= 0x0300 && uc < 0x0370) {
       //nop => translit
+      //TODO nieco s tym vymysliet
       ////char32_t b = read(); //prev char
       //auto d = uc - 0x0300;
       ////auto de[] = {,/,,,,,,,:,,o,,v,,,};
@@ -2260,6 +2265,7 @@ char32_t Terminal::consumeUtf(uint8_t b)
   while ( b & (k >> i) ) {
     i++;
     uint8_t c = getNextCode(true);   // true: process ctrl chars
+    //TODO? uint8_t c = getNextCode(false);  //neviem validne pokracovanie utf sekvencie nemoze byt riadiaci znak 
     if(!ISUTFNEXT(c)) {
       //log("invalid UTF-8 sequence");
       //pushback(c);
@@ -2465,8 +2471,15 @@ uint8_t Terminal::consumeParamsAndGetCode(int * params, int * paramsCount, bool 
     log(c);
     #endif
 
-    if (c == '?') {
+    //in query ? is first char
+    //for sixel ? is valid value(print nothing) but is at the end as code
+    if (c == '?' && *p == 0) {
       *questionMarkFound = true;
+      continue;
+    }
+
+    //ignore white space formating VT340
+    if (c == ' ') {
       continue;
     }
 
@@ -2516,6 +2529,10 @@ void Terminal::consumeCSI()
     consumeDECPrivateModes(params, paramsCount, c);
     return;
   }
+  // ESC [ ? ... S  
+  // ESC[?2;1;0S sixel geometry query
+  // ESC[?2;0;w;hS sixel geometry response
+  
 
   // ESC [ SPC ...
   if (c == ASCII_SPC) {
@@ -2770,7 +2787,24 @@ void Terminal::consumeCSI()
         }
       }
       break;
-
+    case 't':
+      switch (params[0]) {
+        //mozno by to malo ist do convSendCtrl
+        case 14: //window size; method2 brow6el requests dimension
+          if (m_canvas) {
+            //sprintf(s, "\e[4%d;%dt", h, w);
+            sendCSI();
+            send('4');
+            char s[6];
+            send(';');
+            send(itoa(m_canvas->getHeight(), s, 10));
+            send(';');
+            send(itoa(m_canvas->getWidth(), s, 10));
+            send('t');
+          }
+        break;
+      }
+      break;
     default:
       #if FABGLIB_TERMINAL_DEBUG_REPORT_UNSUPPORT
       log("Unknown: ESC [ ");
@@ -3123,46 +3157,219 @@ void Terminal::execSGRParameters(int const * params, int paramsCount)
     m_canvas->setGlyphOptions(m_glyphOptions);
 }
 
+void Terminal::consumeDCSSixels() {
+  int maxci = 0;
+  int maxr = 0;
+  int recovery = 0;
+  log("ESC P sixel q");
+//  send("process sixel\r\n");
+  uint8_t c = 0;
+  bool finish = false;
+  //pri kresleni treba posuvat aj kurzor 
+  int sixel_x = (m_emuState.cursorX-1) * m_font.width;
+  int sixel_y = (m_emuState.cursorY-1) * m_font.height;
+  bool consumed = true;
+  while (!finish) {
+    if (consumed) {
+      c = getNextCode(false);  // false: do not process ctrl chars, ESC needed here
+      consumed = false;
+    }
+    //send(c);
+    //ESC\ or 9C
+    if (c == ASCII_ESC) {
+      c = getNextCode(false);
+      if (c == '\\' || c == 0x07) { finish = true; break; }
+      //akykolvek ESC znak nemoze byt sucastov sixel sequencie takze by som mal asi skoncit
+    } else if (c == '\"') {
+      //parameters pan,pad,Ph;Pv
+//      send("parameters\r\n");
+      // get parameters
+      bool questionMarkFound;
+      int params[FABGLIB_MAX_CSI_PARAMS];
+      int paramsCount;
+      c = consumeParamsAndGetCode(params, &paramsCount, &questionMarkFound);
+    } else if (c == '#') {
+//      send("palette ");
+      // get parameters
+      bool questionMarkFound;
+      int params[FABGLIB_MAX_CSI_PARAMS];
+      int paramsCount;
+      c = consumeParamsAndGetCode(params, &paramsCount, &questionMarkFound);
+      int colorIndex = params[0];
+      if (colorIndex > maxci) maxci = colorIndex;
+      if (colorIndex >= SIXEL_PALETTE_SIZE || colorIndex < 0) {continue;}
+      if (paramsCount == 1) {
+        //choose palette
+//        send("select\r\n");
+        m_canvas->setPenColor(sixel_palette[colorIndex]);
+      } else if (paramsCount == 5) {
+//        send("create\r\n");
+        switch (params[1]) {
+          case 1: { //HLS
+            //img2sixel ma divnu paletu
+            int h = params[2];//0-359
+            int l = params[3];//0-100
+            int s = params[4];//0-100
+            //4-divne pootocenie o 240deg
+            int hi = ((h/60) + 5) % 6;
+            int hr[6] = {100, 100,   0,   0,   0, 100}; 
+            int hg[6] = {  0, 100, 100, 100,   0,   0}; 
+            int hb[6] = {  0,   0,   0, 100, 100, 100}; 
+            //velmi hrube 
+            if (l>50) {
+//              sixel_palette[colorIndex].R = sixel_palette[colorIndex].G = sixel_palette[colorIndex].B = 255;
+              sixel_palette[colorIndex].R = (255 * (((hr[hi] * s) / 100) + (100-s)/2)) / 100;
+              sixel_palette[colorIndex].G = (255 * (((hg[hi] * s) / 100) + (100-s)/2)) / 100;
+              sixel_palette[colorIndex].B = (255 * (((hb[hi] * s) / 100) + (100-s)/2)) / 100;
+              int ra = 100 - l;
+              int rb = l - 50;
+              sixel_palette[colorIndex].R = (sixel_palette[colorIndex].R * ra) / 50 + (255*rb)/50;
+              sixel_palette[colorIndex].G = (sixel_palette[colorIndex].G * ra) / 50 + (255*rb)/50;
+              sixel_palette[colorIndex].B = (sixel_palette[colorIndex].B * ra) / 50 + (255*rb)/50;
+            } else {
+              //sixel_palette[colorIndex].R = sixel_palette[colorIndex].G = sixel_palette[colorIndex].B = 0;
+              sixel_palette[colorIndex].R = (255 * (((hr[hi] * s) / 100) + (100-s)/2)) / 100;
+              sixel_palette[colorIndex].G = (255 * (((hg[hi] * s) / 100) + (100-s)/2)) / 100;
+              sixel_palette[colorIndex].B = (255 * (((hb[hi] * s) / 100) + (100-s)/2)) / 100;
+              sixel_palette[colorIndex].R = (sixel_palette[colorIndex].R * l) / 50;
+              sixel_palette[colorIndex].G = (sixel_palette[colorIndex].G * l) / 50;
+              sixel_palette[colorIndex].B = (sixel_palette[colorIndex].B * l) / 50;
+            }
+              //grayscale
+              //sixel_palette[colorIndex].R = (255 * l) / 100;
+              //sixel_palette[colorIndex].G = (255 * l) / 100;
+              //sixel_palette[colorIndex].B = (255 * l) / 100;
+            }
+            break;
+          case 2: { //RGB
+            sixel_palette[colorIndex].R = (255 * params[2]) / 100;
+            sixel_palette[colorIndex].G = (255 * params[3]) / 100;
+            sixel_palette[colorIndex].B = (255 * params[4]) / 100;
+            }
+            break;
+          default:
+//            send("unsupported color space\r\n");
+            break;
+        }
+      }
+    } else if (c == '-') {
+      //LF
+//      send("new line\r\n");
+      sixel_x = 0;
+      sixel_y += 6;
+      consumed = true;
+      //cursor nastavim aspon pri LF aby skroloval ale ak odskroluje tak musim aj prepocitat sixel_y
+      //setCursorPos(sixel_x / m_font.width + 1, sixel_y / m_font.height + 1);
+    } else if (c == '$') {
+      //CR
+//      send("carier return\r\n");
+      sixel_x = 0;
+      //sixel_y += 6;
+      consumed = true;   
+    } else if (c == '!') {
+//      send("repeat\r\n");
+      bool questionMarkFound;
+      int params[FABGLIB_MAX_CSI_PARAMS];
+      int paramsCount;
+      c = consumeParamsAndGetCode(params, &paramsCount, &questionMarkFound);
+      if (maxr < params[0]) maxr = params[0];
+      for(int j=0; j < params[0]; j++) {
+        uint8_t sv = c - 63;
+        if (sv&0b00000001) m_canvas->setPixel(sixel_x, sixel_y+0);
+        if (sv&0b00000010) m_canvas->setPixel(sixel_x, sixel_y+1);
+        if (sv&0b00000100) m_canvas->setPixel(sixel_x, sixel_y+2);
+        if (sv&0b00001000) m_canvas->setPixel(sixel_x, sixel_y+3);
+        if (sv&0b00010000) m_canvas->setPixel(sixel_x, sixel_y+4);
+        if (sv&0b00100000) m_canvas->setPixel(sixel_x, sixel_y+5);
+        sixel_x++;
+      }
+      consumed = true;
+    } else if (c >= 0x3f && c < 0x7f) {
+      uint8_t sv = c - 63;
+      if (sv&0b00000001) m_canvas->setPixel(sixel_x, sixel_y+0);
+      if (sv&0b00000010) m_canvas->setPixel(sixel_x, sixel_y+1);
+      if (sv&0b00000100) m_canvas->setPixel(sixel_x, sixel_y+2);
+      if (sv&0b00001000) m_canvas->setPixel(sixel_x, sixel_y+3);
+      if (sv&0b00010000) m_canvas->setPixel(sixel_x, sixel_y+4);
+      if (sv&0b00100000) m_canvas->setPixel(sixel_x, sixel_y+5);
+      sixel_x++;
+      consumed = true;
+    } else {
+      consumed = true;
+      if ( c == 0x0a || c == 0x0d || c == ' ') continue;
+      //unknown = unexpected input = exit sixel consuming
+      //recovery++;
+      //if (recovery > 5) { finish = true; }
+      //send(c);
+//      send(" unknown\r\n");
+    }
+ 
+  }
+  setCursorPos(sixel_x / m_font.width + 1, sixel_y / m_font.height + 1);
+  log("sixel processed");
+  //ak posielam aj znaky tak posle ESC a prve pismeno je odescapovane
+//  send("sixel processed\r\n");
+  char b[9];
+//  send(itoa(maxci, b, 10));
+  //9,
+//  send(" max color index\r\n");
+//  send(itoa(maxr, b, 10));
+  //630,
+//  send(" max repeat\r\n");
+//  send(itoa((int)b, b, 16));
+  //3ffa,
+//  send(" address\r\n");
+}
 
-// "ESC P" (DCS) already consumed
-// consume from parameters to ST (that is ESC "\")
-void Terminal::consumeDCS()
-{
-  #if FABGLIB_TERMINAL_DEBUG_REPORT_ESC
-  log("ESC P");
-  #endif
+void Terminal::consumeDCSUnknown() {
+  //nothing to do
+  consumeDCSComment();
+      #if FABGLIB_TERMINAL_DEBUG_REPORT_UNSUPPORT
+      log("Unknown: ESC P ");
+      //for (int i = 0; i < paramsCount; ++i)
+      //  logFmt("%d %c ", params[i], i < paramsCount - 1 ? ';' : ASCII_SPC);
+      //logFmt("%.*s ESC \\\n", contentLength, content);
+      #endif
+}
 
-  // get parameters
-  bool questionMarkFound;
-  int params[FABGLIB_MAX_CSI_PARAMS];
-  int paramsCount;
-  uint8_t c = consumeParamsAndGetCode(params, &paramsCount, &questionMarkFound);
+void Terminal::consumeDCSComment() {
+  bool finish = false;
+  uint8_t c = 0;
+  while (!finish) {
+    c = getNextCode(false);  // false: do not process ctrl chars, ESC needed here
+    if (c == ASCII_ESC) {
+      c = getNextCode(false);
+      if (c == '\\' || c == 0x07) { finish = true; break; }
+    }
+  }
+}
 
-  // get DCS content up to ST
+void Terminal::consumeDCSRQSS() {
   uint8_t content[FABGLIB_MAX_DCS_CONTENT];
   int contentLength = 0;
-  content[contentLength++] = c;
-  while (true) {
-    uint8_t c = getNextCode(false);  // false: do not process ctrl chars, ESC needed here
-    if (c == ASCII_ESC) {
-      if (getNextCode(false) == '\\')
-        break;  // ST found
-      else {
-        #if FABGLIB_TERMINAL_DEBUG_REPORT_UNSUPPORT
-        log("DCS failed, expected ST\n");
-        #endif
-        return;  // fail
-      }
-    } else if (contentLength == FABGLIB_MAX_DCS_CONTENT) {
-      #if FABGLIB_TERMINAL_DEBUG_REPORT_UNSUPPORT
-      log("DCS failed, content too long\n");
-      #endif
-      return; // fail
-    }
+  uint8_t c = '$';
     content[contentLength++] = c;
-  }
-
-  // $q : DECRQSS, Request Selection or Setting
+    while (true) {
+      uint8_t c = getNextCode(false);  // false: do not process ctrl chars, ESC needed here
+      if (c == ASCII_ESC) {
+        if (getNextCode(false) == '\\')
+          break;  // ST found
+        else {
+          #if FABGLIB_TERMINAL_DEBUG_REPORT_UNSUPPORT
+          log("DCS failed, expected ST\n");
+          #endif
+          return;  // fail
+        }
+      } else if (contentLength == FABGLIB_MAX_DCS_CONTENT) {
+        send("DCS too long\r\n");
+        #if FABGLIB_TERMINAL_DEBUG_REPORT_UNSUPPORT
+        log("DCS failed, content too long\n");
+        #endif
+        return; // fail
+      }
+     content[contentLength++] = c;
+    }
+  // $q : DECRQSS, Request Status String (Selection or Setting)
   if (m_emuState.conformanceLevel >= 3 && contentLength > 2 && content[0] == '$' && content[1] == 'q') {
 
     // "p : request DECSCL setting, reply with: DCS 1 $ r DECSCL " p ST
@@ -3177,15 +3384,45 @@ void Terminal::consumeDCS()
       send("\"p\e\\");
       return; // processed
     }
+  }
+}
 
+// consume from parameters to ST (that is ESC "\")
+void Terminal::consumeDCS()
+{
+  #if FABGLIB_TERMINAL_DEBUG_REPORT_ESC
+  log("ESC P");
+  #endif
+
+  //https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Device-Control-functions
+
+  // get parameters
+  bool questionMarkFound;
+  int params[FABGLIB_MAX_CSI_PARAMS];
+  int paramsCount;
+  uint8_t c = consumeParamsAndGetCode(params, &paramsCount, &questionMarkFound);
+
+  switch (c) {
+  case 'q': {
+    //sixel sequences 
+    consumeDCSSixels();
+    }
+    break;
+  case '$': { 
+    consumeDCSRQSS();
+    }
+    break;
+  case '/': { //comment is //~ first char must be enough to switch case
+    consumeDCSComment();
+    }
+    break;;
+  default: {
+    // get DCS content up to ST
+    consumeDCSUnknown();
+    }
+    break;
   }
 
-  #if FABGLIB_TERMINAL_DEBUG_REPORT_UNSUPPORT
-  log("Unknown: ESC P ");
-  for (int i = 0; i < paramsCount; ++i)
-    logFmt("%d %c ", params[i], i < paramsCount - 1 ? ';' : ASCII_SPC);
-  logFmt("%.*s ESC \\\n", contentLength, content);
-  #endif
 }
 
 
