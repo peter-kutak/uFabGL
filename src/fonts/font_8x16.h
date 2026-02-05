@@ -293,12 +293,18 @@ static const uint8_t FONT_8x16_DATA[] = {
 #include "font_VGA_8x16_0370_Greek.h"
 //0400
 #include "font_VGA_8x16_0400_Cyril.h"
-#include "font_VGA_8x16_0500.h"
+#include "font_VGA_8x16_0500_CyrillicS.h"
+#include "font_VGA_8x16_0530_Armenian.h"
 #include "font_VGA_8x16_0590_Hebrew.h"
 #include "font_VGA_8x16_0600.h"
 #include "font_VGA_8x16_0700.h"
 //0800
-#include"font_VGA_8x16_unk0100.h"
+#include "font_VGA_8x16_0800_Samaritan.h"
+#include "font_VGA_8x16_0840_Mandaic.h"
+#include "font_VGA_8x16_0860_SyriacS.h"
+#include "font_VGA_8x16_0870_ArabicEB.h"
+#include "font_VGA_8x16_08a0_ArabicEA.h"
+//0900
 #include"font_VGA_8x16_unk0100.h"
 #include"font_VGA_8x16_unk0100.h"
 #include"font_VGA_8x16_unk0100.h"
@@ -334,7 +340,7 @@ static const uint8_t FONT_8x16_DATA[] = {
 #include"font_VGA_8x16_unk0010.h"
 #include"font_VGA_8x16_unk0010.h"
 //2100
-#include "font_VGA_8x16_LLSymb.h"
+#include "font_VGA_8x16_2100_LLSymb.h"
 //2150
 #include "font_VGA_8x16_2150.h"
 //2190-21ff
@@ -343,14 +349,11 @@ static const uint8_t FONT_8x16_DATA[] = {
 #include"font_VGA_8x16_2200.h"
 #include"font_VGA_8x16_2300.h"
 #include"font_VGA_8x16_unk0100.h"
-//2500-257f
-#include "font_VGA_8x16_Box.h"
-//2580-259f
-#include "font_VGA_8x16_Block.h"
-//25a0-25ff
+//2500
+#include "font_VGA_8x16_2500_Box.h"
+#include "font_VGA_8x16_2580_Block.h"
 #include "font_VGA_8x16_25a0_Geom.h"
-//2600-26ff
-#include "font_VGA_8x16_Symb.h"
+#include "font_VGA_8x16_2600_Symbols.h"
 //2700
 #include"font_VGA_8x16_2700.h"
 //2800-28ff
