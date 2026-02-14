@@ -3161,8 +3161,12 @@ void Terminal::consumeDCSSixels() {
   int maxci = 0;
   int maxr = 0;
   int recovery = 0;
+  #if FABGLIB_TERMINAL_DEBUG_REPORT_ESC
   log("ESC P sixel q");
-//  send("process sixel\r\n");
+  #endif
+  #if FABGLIB_TERMINAL_DEBUG_REPORT_SIXEL
+  log("process sixel");
+  #endif
   uint8_t c = 0;
   bool finish = false;
   //pri kresleni treba posuvat aj kurzor 
@@ -3174,7 +3178,6 @@ void Terminal::consumeDCSSixels() {
       c = getNextCode(false);  // false: do not process ctrl chars, ESC needed here
       consumed = false;
     }
-    //send(c);
     //ESC\ or 9C
     if (c == ASCII_ESC) {
       c = getNextCode(false);
@@ -3182,14 +3185,18 @@ void Terminal::consumeDCSSixels() {
       //akykolvek ESC znak nemoze byt sucastov sixel sequencie takze by som mal asi skoncit
     } else if (c == '\"') {
       //parameters pan,pad,Ph;Pv
-//      send("parameters\r\n");
+      #if FABGLIB_TERMINAL_DEBUG_REPORT_SIXEL
+      log("parameters");
+      #endif
       // get parameters
       bool questionMarkFound;
       int params[FABGLIB_MAX_CSI_PARAMS];
       int paramsCount;
       c = consumeParamsAndGetCode(params, &paramsCount, &questionMarkFound);
     } else if (c == '#') {
-//      send("palette ");
+      #if FABGLIB_TERMINAL_DEBUG_REPORT_SIXEL
+      log("palette ");
+      #endif
       // get parameters
       bool questionMarkFound;
       int params[FABGLIB_MAX_CSI_PARAMS];
@@ -3227,13 +3234,17 @@ void Terminal::consumeDCSSixels() {
             }
             break;
           default:
-//            send("unsupported color space\r\n");
+              #if FABGLIB_TERMINAL_DEBUG_REPORT_SIXEL
+              log("unsupported color space");
+              #endif
             break;
         }
       }
     } else if (c == '-') {
       //LF
-//      send("new line\r\n");
+      #if FABGLIB_TERMINAL_DEBUG_REPORT_SIXEL
+      log("new line");
+      #endif
       sixel_x = 0;
       sixel_y += 6;
       consumed = true;
@@ -3241,12 +3252,16 @@ void Terminal::consumeDCSSixels() {
       //setCursorPos(sixel_x / m_font.width + 1, sixel_y / m_font.height + 1);
     } else if (c == '$') {
       //CR
-//      send("carier return\r\n");
+      #if FABGLIB_TERMINAL_DEBUG_REPORT_SIXEL
+      log("carier return");
+      #endif
       sixel_x = 0;
       //sixel_y += 6;
       consumed = true;   
     } else if (c == '!') {
-//      send("repeat\r\n");
+      #if FABGLIB_TERMINAL_DEBUG_REPORT_SIXEL
+      log("repeat");
+      #endif
       bool questionMarkFound;
       int params[FABGLIB_MAX_CSI_PARAMS];
       int paramsCount;
@@ -3280,24 +3295,16 @@ void Terminal::consumeDCSSixels() {
       //recovery++;
       //if (recovery > 5) { finish = true; }
       //send(c);
-//      send(" unknown\r\n");
+      #if FABGLIB_TERMINAL_DEBUG_REPORT_SIXEL
+      log(" unknown");
+      #endif
     }
  
   }
   setCursorPos(sixel_x / m_font.width + 1, sixel_y / m_font.height + 1);
+  #if FABGLIB_TERMINAL_DEBUG_REPORT_SIXEL
   log("sixel processed");
-  //ak posielam aj znaky tak posle ESC a prve pismeno je odescapovane
-//  send("sixel processed\r\n");
-  char b[9];
-//  send(itoa(maxci, b, 10));
-  //9,
-//  send(" max color index\r\n");
-//  send(itoa(maxr, b, 10));
-  //630,
-//  send(" max repeat\r\n");
-//  send(itoa((int)b, b, 16));
-  //3ffa,
-//  send(" address\r\n");
+  #endif
 }
 
 void Terminal::consumeDCSUnknown() {
