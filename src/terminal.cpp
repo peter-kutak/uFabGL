@@ -3199,46 +3199,25 @@ void Terminal::consumeDCSSixels() {
       if (colorIndex > maxci) maxci = colorIndex;
       if (colorIndex >= SIXEL_PALETTE_SIZE || colorIndex < 0) {continue;}
       if (paramsCount == 1) {
-        //choose palette
-//        send("select\r\n");
+        //select color from palette
         m_canvas->setPenColor(sixel_palette[colorIndex]);
       } else if (paramsCount == 5) {
-//        send("create\r\n");
+        //define color in palette
         switch (params[1]) {
           case 1: { //HLS
-            //img2sixel ma divnu paletu
             int h = params[2];//0-359
             int l = params[3];//0-100
             int s = params[4];//0-100
-            //4-divne pootocenie o 240deg
-            int hi = ((h/60) + 5) % 6;
-            int hr[6] = {100, 100,   0,   0,   0, 100}; 
-            int hg[6] = {  0, 100, 100, 100,   0,   0}; 
-            int hb[6] = {  0,   0,   0, 100, 100, 100}; 
-            //velmi hrube 
-            if (l>50) {
-//              sixel_palette[colorIndex].R = sixel_palette[colorIndex].G = sixel_palette[colorIndex].B = 255;
-              sixel_palette[colorIndex].R = (255 * (((hr[hi] * s) / 100) + (100-s)/2)) / 100;
-              sixel_palette[colorIndex].G = (255 * (((hg[hi] * s) / 100) + (100-s)/2)) / 100;
-              sixel_palette[colorIndex].B = (255 * (((hb[hi] * s) / 100) + (100-s)/2)) / 100;
-              int ra = 100 - l;
-              int rb = l - 50;
-              sixel_palette[colorIndex].R = (sixel_palette[colorIndex].R * ra) / 50 + (255*rb)/50;
-              sixel_palette[colorIndex].G = (sixel_palette[colorIndex].G * ra) / 50 + (255*rb)/50;
-              sixel_palette[colorIndex].B = (sixel_palette[colorIndex].B * ra) / 50 + (255*rb)/50;
-            } else {
-              //sixel_palette[colorIndex].R = sixel_palette[colorIndex].G = sixel_palette[colorIndex].B = 0;
-              sixel_palette[colorIndex].R = (255 * (((hr[hi] * s) / 100) + (100-s)/2)) / 100;
-              sixel_palette[colorIndex].G = (255 * (((hg[hi] * s) / 100) + (100-s)/2)) / 100;
-              sixel_palette[colorIndex].B = (255 * (((hb[hi] * s) / 100) + (100-s)/2)) / 100;
-              sixel_palette[colorIndex].R = (sixel_palette[colorIndex].R * l) / 50;
-              sixel_palette[colorIndex].G = (sixel_palette[colorIndex].G * l) / 50;
-              sixel_palette[colorIndex].B = (sixel_palette[colorIndex].B * l) / 50;
-            }
-              //grayscale
-              //sixel_palette[colorIndex].R = (255 * l) / 100;
-              //sixel_palette[colorIndex].G = (255 * l) / 100;
-              //sixel_palette[colorIndex].B = (255 * l) / 100;
+            int ri = (0 + (h / (360/12))) % 12;
+            int gi = (8 + (h / (360/12))) % 12;
+            int bi = (4 + (h / (360/12))) % 12;
+            //pootocene voci wiki vzorcu podla testov
+            // img2sixel -w400 -h 300 -qhigh -thls -p64 -da_dither hsl.png > /dev/ttyUSB0 
+            int hv[12] = {  1, 0, -1, -1, -1, -1, -1, 0,  1, 1,  1, 1}; 
+            int a = s * min(l, 100 - l);
+            sixel_palette[colorIndex].R = ((l - (a * hv[ri] / 100)) * 255) / 100;
+            sixel_palette[colorIndex].G = ((l - (a * hv[gi] / 100)) * 255) / 100;
+            sixel_palette[colorIndex].B = ((l - (a * hv[bi] / 100)) * 255) / 100;
             }
             break;
           case 2: { //RGB
