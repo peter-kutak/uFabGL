@@ -230,7 +230,7 @@ void Keyboard::setLayout(const KeyboardLayout * layout)
 char const * Keyboard::virtualKeyToString(VirtualKey virtualKey)
 {
   char const * VKTOSTR[] = { 
-#define VKLI(name) #name
+#define VKLI(name) #name,
   #include "vklistitems.h"
 #undef VKLI
                           };
